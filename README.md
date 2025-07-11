@@ -1,4 +1,3 @@
-
 # JobConnect - MERN Stack Job Application Portal
 
 ## Project Overview
@@ -10,6 +9,7 @@ JobConnect is a MERN stack job portal connecting job seekers with employers. It 
 ## Features
 
 ### Job Seeker
+
 - Register/Login with 2FA
 - Upload profile picture and resume
 - Search and apply for jobs that match qualifications
@@ -18,6 +18,7 @@ JobConnect is a MERN stack job portal connecting job seekers with employers. It 
 - Receive email notifications on registration, application, and status updates
 
 ### Company (Employer)
+
 - Register (default role is jobseeker)
 - Admin approval required for company activation
 - Post, edit, delete job listings
@@ -26,6 +27,7 @@ JobConnect is a MERN stack job portal connecting job seekers with employers. It 
 - Receive notifications on account/job approvals and new applications
 
 ### Admin
+
 - Login to admin panel
 - Approve/reject companies and job listings
 - Manage users, jobs, and applications
@@ -36,11 +38,11 @@ JobConnect is a MERN stack job portal connecting job seekers with employers. It 
 
 ## System Architecture
 
-- **Frontend:** React.js SPA with React Router, Context API for state, TailwindCSS styling  
-- **Backend:** Express.js REST API, JWT auth with 2FA, role-based middleware, Nodemailer email notifications, Cloudinary file uploads  
-- **Database:** MongoDB with Mongoose ODM  
-- **File Storage:** Cloudinary for profile pictures and resumes  
-- **Email:** Nodemailer for registration, application, and status emails  
+- **Frontend:** React.js SPA with React Router, Context API for state, TailwindCSS styling
+- **Backend:** Express.js REST API, JWT auth with 2FA, role-based middleware, Nodemailer email notifications, Cloudinary file uploads
+- **Database:** MongoDB with Mongoose ODM
+- **File Storage:** Cloudinary for profile pictures and resumes
+- **Email:** Nodemailer for registration, application, and status emails
 
 ---
 
@@ -71,13 +73,14 @@ frontend/
 ├── tailwind.config.js
 └── package.json
 
-````
+```
 
 ---
 
 ## Database Schemas (Mongoose)
 
 ### User
+
 ```js
 {
   name: String,
@@ -91,7 +94,7 @@ frontend/
   otpExpiresAt: Date,
   qualifications: [String]
 }
-````
+```
 
 ### Job
 
@@ -167,7 +170,11 @@ frontend/
 
 ## License
 
-[MIT](LICENSE) (or your preferred license)
+[MIT](LICENSE) License.
+
+The online pichdeck: 
+
+https://jobconnect-project--ftj5fg6.gamma.site
 
 ---
 
@@ -185,5 +192,7 @@ frontend/
 
 *Developed by \Silas HAKUZWIMANA*
 *Date: \On Friday, July 11th, 2025*
+
+```
 
 ```
