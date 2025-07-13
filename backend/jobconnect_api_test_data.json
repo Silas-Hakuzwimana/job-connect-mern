@@ -1,0 +1,59 @@
+{
+  "auth": {
+    "register": {
+      "name": "Jane Doe",
+      "email": "jane@example.com",
+      "password": "SecurePass123!",
+      "role": "jobseeker"
+    },
+    "login": {
+      "email": "jane@example.com",
+      "password": "SecurePass123!"
+    },
+    "verify_otp": {
+      "email": "jane@example.com",
+      "otp": "123456"
+    },
+    "request_password_reset": {
+      "email": "jane@example.com"
+    },
+    "reset_password": {
+      "email": "jane@example.com",
+      "token": "reset-token-here",
+      "newPassword": "NewSecurePass123!"
+    }
+  },
+  "users": {
+    "update_user": {
+      "name": "Jane D. Updated",
+      "bio": "Frontend developer with 4 years of experience",
+      "location": "Kigali, Rwanda"
+    },
+    "update_role": {
+      "role": "employer"
+    }
+  },
+  "jobs": {
+    "create": {
+      "title": "Frontend Developer",
+      "description": "We are looking for a ReactJS expert.",
+      "location": "Remote",
+      "qualifications": [
+        "Bachelor\u2019s Degree in Computer Science",
+        "3+ years experience with React"
+      ]
+    }
+  },
+  "applications": {
+    "apply": {
+      "qualifications": "[\"Bachelor\\u2019s Degree in Computer Science\"]",
+      "coverLetter": "I am passionate about frontend development."
+    }
+  },
+  "qualifications": {
+    "create": {
+      "title": "Bachelor\u2019s Degree in Computer Science",
+      "description": "4-year undergraduate program focused on computing skills"
+    }
+  }
+}

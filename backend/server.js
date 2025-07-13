@@ -18,6 +18,9 @@ const jobRoutes = require('./routes/job.routes');
 const userRoutes = require('./routes/user.routes');
 const qualificationRoutes = require('./routes/qualification.routes');
 const applicationRoutes = require('./routes/application.routes');
+const adminRoutes = require('./routes/admin.routes');
+
+
 
 dotenv.config();
 const app = express();
@@ -40,6 +43,7 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/qualifications', qualificationRoutes);
 app.use('/api/applications', applicationRoutes);
+app.use('/api/admin', adminRoutes);
 
 //API Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));

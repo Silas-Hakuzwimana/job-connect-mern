@@ -154,6 +154,30 @@ paths:
         "200":
           description: User deleted
 
+  /api/users/{id}/role:
+    put:
+      summary: Update user role (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  enum: [jobseeker, employer, admin]
+      responses:
+        "200":
+          description: Role updated
+
   /api/users/upload-profile-pic:
     post:
       summary: Upload profile picture to Cloudinary
@@ -209,6 +233,19 @@ paths:
           description: Job found
         "404":
           description: Job not found
+    delete:
+      summary: Delete job (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Job deleted
 
   /api/applications/apply/{jobId}:
     post:
@@ -249,6 +286,15 @@ paths:
         "200":
           description: List of applications
 
+  /api/admin/applications:
+    get:
+      summary: View all job applications (admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of all job applications
+
   /api/qualifications:
     get:
       summary: Get all qualifications
@@ -270,6 +316,21 @@ paths:
       responses:
         "201":
           description: Qualification created
+
+  /api/qualifications/{id}:
+    delete:
+      summary: Delete qualification (Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Qualification deleted
 
 components:
   securitySchemes:
