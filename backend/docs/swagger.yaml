@@ -1,0 +1,326 @@
+openapi: 3.0.0
+info:
+  title: JobConnect API
+  version: 1.0.0
+  description: API documentation for the JobConnect platform
+
+servers:
+  - url: http://localhost:5000
+
+paths:
+  /api/auth/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserInput"
+      responses:
+        "201":
+          description: User registered successfully
+        "400":
+          description: User already exists
+
+  /api/auth/login:
+    post:
+      summary: Login and receive OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: OTP sent to email
+        "401":
+          description: Invalid credentials
+
+  /api/auth/verify-otp:
+    post:
+      summary: Verify OTP and get JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                otp:
+                  type: string
+      responses:
+        "200":
+          description: JWT token returned
+        "400":
+          description: Invalid or expired OTP
+
+  /api/auth/request-password-reset:
+    post:
+      summary: Request password reset link
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+      responses:
+        "200":
+          description: Password reset email sent
+
+  /api/auth/reset-password:
+    post:
+      summary: Reset password using token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                token:
+                  type: string
+                newPassword:
+                  type: string
+      responses:
+        "200":
+          description: Password changed
+
+  /api/users:
+    get:
+      summary: Get all users (admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of users
+
+  /api/users/{id}:
+    get:
+      summary: Get user by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User data
+    put:
+      summary: Update user by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: User updated
+    delete:
+      summary: Delete user (admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User deleted
+
+  /api/users/upload-profile-pic:
+    post:
+      summary: Upload profile picture to Cloudinary
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                profilePic:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Profile picture uploaded
+
+  /api/jobs:
+    get:
+      summary: Get all active jobs
+      responses:
+        "200":
+          description: List of jobs
+    post:
+      summary: Create a new job post (Employer only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobInput"
+      responses:
+        "201":
+          description: Job created
+        "403":
+          description: Unauthorized
+
+  /api/jobs/{id}:
+    get:
+      summary: Get a single job by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Job found
+        "404":
+          description: Job not found
+
+  /api/applications/apply/{jobId}:
+    post:
+      summary: Apply to a job with resume
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                qualifications:
+                  type: string
+                  description: JSON stringified array of qualifications
+                coverLetter:
+                  type: string
+                resume:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Application submitted
+
+  /api/applications:
+    get:
+      summary: View your or managed applications
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of applications
+
+  /api/qualifications:
+    get:
+      summary: Get all qualifications
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of qualifications
+    post:
+      summary: Create new qualification (Admin/Employer only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QualificationInput"
+      responses:
+        "201":
+          description: Qualification created
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    UserInput:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum: [jobseeker, employer, admin]
+
+    JobInput:
+      type: object
+      required:
+        - title
+        - description
+        - location
+        - qualifications
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        location:
+          type: string
+        qualifications:
+          type: array
+          items:
+            type: string
+
+    QualificationInput:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+        description:
+          type: string

@@ -1,0 +1,61 @@
+jobconnect-backend/
+│
+├── config/                # Environment config, DB connection
+│   ├── db.js              # MongoDB connection setup
+│   └── env.js             # Environment variable loader
+│
+├── controllers/           # Route logic
+│   ├── auth.controller.js
+│   ├── user.controller.js
+│   ├── job.controller.js
+│   ├── application.controller.js
+│   └── admin.controller.js
+│
+├── middlewares/           # Middleware (auth, error handling, etc.)
+│   ├── auth.middleware.js
+│   ├── role.middleware.js
+│   ├── error.middleware.js
+│   └── rateLimit.middleware.js
+│
+├── models/                # Mongoose models
+│   ├── User.js
+│   ├── Job.js
+│   ├── Application.js
+│   └── Qualification.js
+│
+├── routes/                # Express route definitions
+│   ├── auth.routes.js
+│   ├── user.routes.js
+│   ├── job.routes.js
+│   ├── application.routes.js
+│   └── admin.routes.js
+│
+├── services/              # Business logic and helper functions
+│   ├── mail.service.js
+│   ├── token.service.js
+│   ├── qualification.service.js
+│   └── logger.service.js
+│
+├── utils/                 # Utility functions (validators, etc.)
+│   ├── passwordUtils.js
+│   └── validator.js
+│
+├── .env                   # Environment variables
+├── server.js              # Entry point for the Express app
+└── package.json
+
+
+
+
+| Command             | Description                                   |
+| ------------------- | --------------------------------------------- |
+| `pwd`               | Show current directory                        |
+| `ls`                | List contents of current directory            |
+| `ls -l`             | List contents in detail                       |
+| `cd folder_name`    | Change into a folder                          |
+| `cd ..`             | Go up one level                               |
+| `mkdir folder_name` | Create a new folder                           |
+| `touch file_name`   | Create a new file                             |
+| `code .`            | Open current folder in VS Code (if installed) |
+| `rm filename`       | Delete a file                                 |
+| `rm -r foldername`  | Delete a folder (recursive)                   |
