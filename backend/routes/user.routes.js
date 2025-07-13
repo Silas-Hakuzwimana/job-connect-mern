@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/user.controller');
 const { auth, restrictTo } = require('../middlewares/auth.middleware');
-const upload = require('../middlewares/upload.middleware');
 const upload = require('../middlewares/uploadCloudinary');
 
 // Admin only routes
