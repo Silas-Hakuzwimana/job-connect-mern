@@ -7,6 +7,8 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Register from "./pages/Register";
 import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";
@@ -99,6 +101,22 @@ export default function App() {
                     }
                 />
                 <Route
+                    path="/forgot-password"
+                    element={
+                        <PublicRoute>
+                            <ForgotPassword />
+                        </PublicRoute>
+                    }
+                />
+                <Route
+                    path="/reset-password"
+                    element={
+                        <PublicRoute>
+                            <ResetPassword />
+                        </PublicRoute>
+                    }
+                />
+                <Route
                     path="/register"
                     element={
                         <PublicRoute>
@@ -170,7 +188,7 @@ export default function App() {
                     }
                 />
 
-                 {/* JobSeeker Dashboard */}
+                {/* JobSeeker Dashboard */}
                 <Route
                     path="/jobseeker/*"
                     element={

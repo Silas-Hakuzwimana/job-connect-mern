@@ -61,6 +61,12 @@ export default function Login() {
         }
     };
 
+    // Function to redirect to a different path
+    const redirectTo = (path) => {
+        navigate(path);
+    };
+
+    // Handle OTP input change
     const handleOtpChange = (e) => {
         const value = e.target.value.replace(/\D/g, ''); // Only allow digits
         if (value.length <= 6) {
@@ -169,7 +175,7 @@ export default function Login() {
                             {/* Forgot Password Link */}
                             <div className="text-right">
                                 <a
-                                    href="/forgot-password"
+                                    href="#" onClick={() => redirectTo('/forgot-password')}
                                     className="text-sm text-blue-600 hover:text-blue-700 hover:underline transition-colors"
                                 >
                                     Forgot your password?
@@ -197,10 +203,20 @@ export default function Login() {
                                 <p className="text-gray-600">
                                     Don't have an account?{" "}
                                     <a
-                                        href="/register"
+                                        href="#"
+                                        onClick={() => redirectTo('/register')}
                                         className="font-semibold text-blue-600 hover:text-blue-700 transition-colors hover:underline"
                                     >
                                         Create one here
+                                    </a>
+                                </p>
+                                <p>
+                                    <a
+                                        href="#"
+                                        onClick={() => redirectTo('/')}
+                                        className="text-sm tex-blue-500 hover:text-blue-800 transition-colors"
+                                    >
+                                        Back to home
                                     </a>
                                 </p>
                             </div>

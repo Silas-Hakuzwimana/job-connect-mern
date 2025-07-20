@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Eye, EyeOff, User, Mail, Lock, Building2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import authService from "../services/authService"; 
+import authService from "../services/authService";
 
 export default function Register() {
     const [form, setForm] = useState({
@@ -23,51 +23,55 @@ export default function Register() {
     }
 
     async function handleSubmit(e) {
-    e.preventDefault();
-    setError("");
+        e.preventDefault();
+        setError("");
 
-    // Password confirmation check
-    if (form.password !== form.confirmPassword) {
-        setError("Passwords do not match");
-        return;
+        // Password confirmation check
+        if (form.password !== form.confirmPassword) {
+            setError("Passwords do not match");
+            return;
+        }
+
+        // Basic client-side validation
+        if (form.name.length < 2) {
+            setError("Name must be at least 2 characters");
+            return;
+        }
+        if (!/\S+@\S+\.\S+/.test(form.email)) {
+            setError("Invalid email format");
+            return;
+        }
+        if (form.password.length < 6) {
+            setError("Password must be at least 6 characters");
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            await authService.register({
+                name: form.name,
+                email: form.email,
+                password: form.password,
+                role: form.role,
+            });
+
+            toast.success("Registration successful! Please login.");
+            navigate("/login");
+        } catch (err) {
+            setError(
+                err.response?.data?.message ||
+                err.response?.data?.error ||
+                "Registration failed"
+            );
+        } finally {
+            setLoading(false);
+        }
     }
 
-    // Basic client-side validation
-    if (form.name.length < 2) {
-        setError("Name must be at least 2 characters");
-        return;
+    const redirectTo = (url) => {
+        navigate(url);
     }
-    if (!/\S+@\S+\.\S+/.test(form.email)) {
-        setError("Invalid email format");
-        return;
-    }
-    if (form.password.length < 6) {
-        setError("Password must be at least 6 characters");
-        return;
-    }
-
-    setLoading(true);
-
-    try {
-        await authService.register({
-            name: form.name,
-            email: form.email,
-            password: form.password,
-            role: form.role,
-        });
-
-        toast.success("Registration successful! Please login.");
-        navigate("/login");
-    } catch (err) {
-        setError(
-            err.response?.data?.message ||
-            err.response?.data?.error ||
-            "Registration failed"
-        );
-    } finally {
-        setLoading(false);
-    }
-}
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
@@ -243,11 +247,21 @@ export default function Register() {
                         <div className="text-center pt-4">
                             <p className="text-gray-600">
                                 Already have an account?{" "}
-                                <a 
-                                    href="/login" 
+                                <a
+                                    href="#"
+                                    onClick={()=>redirectTo('/login')}
                                     className="font-semibold text-blue-600 hover:text-blue-700 transition-colors hover:underline"
                                 >
                                     Sign in here
+                                </a>
+                            </p>
+                            <p>
+                                <a
+                                    href="#"
+                                    onClick={()=>redirectTo('/')}
+                                    className="text-sm tex-blue-500 hover:text-blue-800 transition-colors"
+                                >
+                                    Back to home
                                 </a>
                             </p>
                         </div>

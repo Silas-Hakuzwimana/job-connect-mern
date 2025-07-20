@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, Users, Building2, Shield, ChevronRight, Star, Briefcase, TrendingUp, CheckCircle } from 'lucide-react';
 
 export default function Home() {
@@ -31,6 +32,11 @@ export default function Home() {
     
     return () => clearInterval(timer);
   }, []);
+
+  const navigate = useNavigate();
+  const redirectTo = (url) => {
+    navigate(url);
+  };
 
   const testimonials = [
     {
@@ -135,7 +141,7 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <button className="mt-6 w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
+            <button className="mt-6 w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2" onClick={() => redirectTo('/login')}>
               <span>Get Started</span>
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -163,7 +169,7 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <button className="mt-6 w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2">
+            <button className="mt-6 w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2" onClick={() => redirectTo('/login')}>
               <span>Start Hiring</span>
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -191,7 +197,7 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <button className="mt-6 w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2">
+            <button className="mt-6 w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2" onClick={() => redirectTo('/login')}>
               <span>Admin Panel</span>
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -262,10 +268,10 @@ export default function Home() {
             Join JobHub today and take the next step in your career journey
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="px-8 py-4 bg-white text-blue-600 rounded-lg hover:bg-gray-100 transition-colors font-semibold">
+            <button className="px-8 py-4 bg-white text-blue-600 rounded-lg hover:bg-gray-100 transition-colors font-semibold" onClick={() => redirectTo('/login')}>
               Find Jobs
             </button>
-            <button className="px-8 py-4 border-2 border-white text-white rounded-lg hover:bg-white hover:text-blue-600 transition-colors font-semibold">
+            <button className="px-8 py-4 border-2 border-white text-white rounded-lg hover:bg-white hover:text-blue-600 transition-colors font-semibold" onClick={() => redirectTo('/login')}>
               Post Jobs
             </button>
           </div>

@@ -9,8 +9,8 @@ router.post('/verify-otp', authController.verifyOTP);
 
 //Password request routes
 
-router.post('/request-password-reset', authController.requestPasswordReset);
-router.post('/reset-password', authController.resetPassword);
+router.post('/forgot-password', authController.requestPasswordReset);
+router.post('/reset-password/:token', authController.resetPassword);
 
 
 module.exports = router;

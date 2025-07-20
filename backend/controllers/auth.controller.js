@@ -84,6 +84,7 @@ exports.verifyOTP = async (req, res) => {
 // Request password reset - generates token and emails user
 exports.requestPasswordReset = async (req, res) => {
   const { email } = req.body;
+  console.log("requestPasswordReset email:", email);
   try {
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ error: 'User not found' });
@@ -94,7 +95,9 @@ exports.requestPasswordReset = async (req, res) => {
     await user.save();
 
     // Send email with reset link containing token
-    const resetUrl = `${process.env.FRONT_END_URL}/reset-password?token=${user.resetPasswordToken}&email=${email}`;
+    const resetUrl = `${process.env.FRONT_END_URL}/reset-password?token=${user.resetPasswordToken}&email=${user.email}`;
+    console.log("Reset URL:", resetUrl);
+    // Send reset email
     await sendResetEmail(email, resetUrl);
 
     res.json({ message: 'Password reset email sent' });
@@ -105,10 +108,9 @@ exports.requestPasswordReset = async (req, res) => {
 
 
 exports.resetPassword = async (req, res) => {
-  const { token, email, newPassword } = req.body;
+  const { token, newPassword } = req.body;
   try {
     const user = await User.findOne({ 
-      email,
       resetPasswordToken: token,
       resetPasswordExpires: { $gt: Date.now() }
     });

@@ -16,6 +16,19 @@ const register = async (userData) => {
   return res.data;
 };
 
+const forgotPassword = async (data) => {
+  const res = await api.post("/auth/forgot-password", data);
+  return res.data;
+};
+
+const resetPassword = async ({ email, token, password }) => {
+  const res = await api.post(`/auth/reset-password/${token}`, {
+    email,
+    password,
+  });
+  return res.data;
+};
+
 const logout = async () => {
   const res = await api.post("/auth/logout");
   return res.data;
@@ -31,6 +44,8 @@ export default {
   verifyOtp,
   register,
   logout,
+  forgotPassword,
+  resetPassword,
   getCurrentUser,
   // Add any other auth-related methods here
 };
