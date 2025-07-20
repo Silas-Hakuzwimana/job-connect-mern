@@ -1,73 +1,71 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-
+import authService from "../services/authService";
+import { toast } from "react-toastify";
 
 export default function Login() {
     const navigate = useNavigate();
     const { login } = useContext(AuthContext);
 
-    const [step, setStep] = useState(1); // 1 = enter email/pass, 2 = enter OTP
+    const [step, setStep] = useState(1);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [otp, setOtp] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    async function handleLoginSubmit(e) {
+    const handleLoginSubmit = async (e) => {
         e.preventDefault();
         setError("");
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:5000/api/auth/login', {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password }),
-            });
-            const data = await res.json();
-            if (!res.ok) {
-                setError(data.message || "Invalid credentials");
-            } else {
-                setStep(2);
-            }
-        } catch {
-            setError("Server error");
+            await authService.login({ email, password });
+            setStep(2);
+            toast.info("OTP sent to your email");
+        } catch (err) {
+            setError(err.response?.data?.message || "Invalid credentials");
         } finally {
             setLoading(false);
         }
-    }
+    };
 
-    async function handleOtpSubmit(e) {
+    const handleOtpSubmit = async (e) => {
         e.preventDefault();
         setError("");
         setLoading(true);
         try {
-            const res = await fetch("http://localhost:5000/api/auth/verify-otp", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, otp }),
-            });
-            const data = await res.json();
-            if (!res.ok) {
-                setError(data.message || "Invalid OTP");
-            } else {
-                login(data.user);
-                navigate("/company/dashboard");
+            const { user } = await authService.verifyOtp({ email, otp });
+            login(user); // save user in context/localStorage
+            toast.success("Logged in successfully");
+
+            // 🔀 Redirect based on role
+            switch (user.role) {
+                case "admin":
+                    navigate("/admin/dashboard");
+                    break;
+                case "company":
+                    navigate("/company/dashboard");
+                    break;
+                case "seeker":
+                    navigate("/seeker/dashboard");
+                    break;
+                default:
+                    navigate("/");
             }
-        } catch {
-            setError("Server error");
+        } catch (err) {
+            setError(err.response?.data?.message || "Invalid OTP");
         } finally {
             setLoading(false);
         }
-    }
+    };
+
 
     return (
         <div className="max-w-md mx-auto mt-12 p-8 border rounded shadow">
             <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
 
-            {error && (
-                <div className="bg-red-100 text-red-700 p-3 mb-4 rounded">{error}</div>
-            )}
+            {error && <div className="bg-red-100 text-red-700 p-3 mb-4 rounded">{error}</div>}
 
             {step === 1 && (
                 <form onSubmit={handleLoginSubmit} className="space-y-4">
@@ -100,9 +98,8 @@ export default function Login() {
                     >
                         {loading ? "Verifying..." : "Login"}
                     </button>
-                    <p>
-                        <span className="text-gray-600">Don't have an account?</span>
-                        &nbsp;
+                    <p className="text-sm text-center mt-2">
+                        Don't have an account?{" "}
                         <a href="/register" className="text-blue-600 hover:underline">
                             Register here
                         </a>

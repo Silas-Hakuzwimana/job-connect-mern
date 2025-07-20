@@ -32,20 +32,53 @@ exports.login = async (req, res) => {
   res.status(200).json({ message: 'OTP sent to your email' });
 };
 
+
 exports.verifyOTP = async (req, res) => {
-  const { email, otp } = req.body;
-  const user = await User.findOne({ email });
+  try {
+    const { email, otp } = req.body;
 
-  if (!user || user.otp !== otp || user.otpExpiresAt < Date.now()) {
-    return res.status(400).json({ error: 'Invalid or expired OTP' });
+    // Log incoming request (optional for debugging)
+    console.log("verifyOTP req.body:", req.body);
+
+    // Validate input types
+    if (typeof email !== 'string' || typeof otp !== 'string') {
+      return res.status(400).json({ error: 'Email and OTP must be strings' });
+    }
+
+    // Look up the user by email
+    const user = await User.findOne({ email });
+
+    if (
+      !user ||
+      user.otp !== otp ||
+      !user.otpExpiresAt ||
+      user.otpExpiresAt < Date.now()
+    ) {
+      return res.status(400).json({ error: 'Invalid or expired OTP' });
+    }
+
+    // Clear OTP fields
+    user.otp = undefined;
+    user.otpExpiresAt = undefined;
+    await user.save();
+
+    // Generate JWT token
+    const token = generateToken(user);
+
+    // Send response
+    res.status(200).json({
+      token,
+      user: {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        id: user._id
+      }
+    });
+  } catch (error) {
+    console.error('verifyOTP error:', error.message);
+    res.status(500).json({ error: 'Server error during OTP verification' });
   }
-
-  user.otp = undefined;
-  user.otpExpiresAt = undefined;
-  await user.save();
-
-  const token = generateToken(user);
-  res.status(200).json({ token, user: { name: user.name, role: user.role } });
 };
 
 // Request password reset - generates token and emails user

@@ -14,3 +14,13 @@ export const getJobById = async (jobId) => {
   const res = await api.get(`/jobs/${jobId}`);
   return res.data;
 };
+
+export const updateJob = async (jobId, jobData) => {
+  const res = await api.put(`/jobs/${jobId}`, jobData);
+  return res.data;
+};
+
+export const deleteJob = async (jobId) => {
+  const res = await api.delete(`/jobs/${jobId}`);
+  return res.data;
+};

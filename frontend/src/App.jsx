@@ -13,6 +13,7 @@ import JobDetails from "./pages/JobDetails";
 import Profile from "./pages/Profile";
 import CompanyDashboard from "./pages/company/CompanyDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import JobSeekerDashboard from "./pages/jobseeker/JobSeekerDashboard";
 import NotFound from "./pages/NotFound";
 import Logout from "./pages/Logout";
 import { ToastContainer } from 'react-toastify';
@@ -63,7 +64,7 @@ function PublicRoute({ children }) {
             case 'company':
                 return <Navigate to="/company/dashboard" replace />;
             case 'jobseeker':
-                return <Navigate to="/jobs" replace />;
+                return <Navigate to="/jobseeker/dashboard" replace />;
             default:
                 return <Navigate to="/" replace />;
         }
@@ -164,6 +165,18 @@ export default function App() {
                         <ProtectedRoute roles={["company"]} fallbackPath="/jobs">
                             <Layout>
                                 <CompanyDashboard />
+                            </Layout>
+                        </ProtectedRoute>
+                    }
+                />
+
+                 {/* JobSeeker Dashboard */}
+                <Route
+                    path="/jobseeker/*"
+                    element={
+                        <ProtectedRoute roles={["jobseeker"]} fallbackPath="/jobseeker/dashboard">
+                            <Layout>
+                                <JobSeekerDashboard />
                             </Layout>
                         </ProtectedRoute>
                     }
