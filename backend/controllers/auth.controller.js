@@ -1,8 +1,9 @@
 const User = require('../models/User');
 const crypto = require('crypto');
 const { generateToken } = require('../services/token.service');
-const { sendOTPEmail } = require('../services/mail.service');
-const { sendResetEmail } = require('../services/mail.service'); // You’ll create this email later
+const { sendOTPEmail, sendResetEmail } = require('../services/mail.service');
+const dotenv = require('dotenv');
+dotenv.config();
 
 exports.register = async (req, res) => {
   try {
@@ -89,4 +90,13 @@ exports.resetPassword = async (req, res) => {
   } catch {
     res.status(500).json({ error: 'Password reset failed' });
   }
+};
+
+exports.logout = (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    sameSite: 'Strict',
+    secure: process.env.NODE_ENV === 'production', // Optional: for production
+  });
+  res.status(200).json({ message: 'Logged out successfully' });
 };
