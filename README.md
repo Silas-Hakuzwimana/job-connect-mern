@@ -153,7 +153,7 @@ frontend/
 * Backend: Deploy on Render/Cyclic
 * Database: MongoDB Atlas
 * File Storage: Cloudinary
-* Email: Nodemailer + SMTP or Gmail
+* Email: Nodemailer + SMTP/Gmail
 
 ---
 
@@ -192,7 +192,5 @@ https://jobconnect-project--ftj5fg6.gamma.site
 
 *Developed by \Silas HAKUZWIMANA*
 *Date: \On Friday, July 11th, 2025*
-
-```
 
 ```
