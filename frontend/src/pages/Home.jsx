@@ -1,6 +1,6 @@
 import { useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Users, Building2, Shield, ChevronRight, Star, Briefcase, TrendingUp, CheckCircle } from 'lucide-react';
+import { Search, Users, Building2, Shield, ChevronRight, Star, CheckCircle, TrendingUpDown } from 'lucide-react';
 
 export default function Home() {
   //const [activeTab, setActiveTab] = useState(0);
@@ -223,12 +223,13 @@ export default function Home() {
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-green-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">2</div>
-              <h3 className="text-xl font-semibold mb-3">Find Matches</h3>
+              <h3 className="text-xl font-semibold mb-3"> Find Matches</h3>
               <p className="text-gray-600">Our algorithm matches you with relevant opportunities or candidates</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-purple-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">3</div>
-              <h3 className="text-xl font-semibold mb-3">Connect & Hire</h3>
+              <h3 className="text-xl font-semibold mb-3">
+                Connect & Hire</h3>
               <p className="text-gray-600">Apply or review applications and make successful connections</p>
             </div>
           </div>

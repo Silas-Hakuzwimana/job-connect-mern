@@ -130,6 +130,14 @@ export default function App() {
                         <Logout />
                     }
                 />
+                <Route
+                    path="/company/dashboard"
+                    element={
+                        <ProtectedRoute roles={["company"]} fallbackPath="/company/dashboard">
+                            <CompanyDashboard />
+                        </ProtectedRoute>
+                    }
+                />
 
                 {/* Public Home page with Layout */}
                 <Route
@@ -177,7 +185,7 @@ export default function App() {
                 />
 
                 {/* Company Dashboard */}
-                <Route
+                {/* <Route
                     path="/company/dashboard"
                     element={
                         <ProtectedRoute roles={["company"]} fallbackPath="/jobs">
@@ -186,7 +194,7 @@ export default function App() {
                             </Layout>
                         </ProtectedRoute>
                     }
-                />
+                /> */}
 
                 {/* JobSeeker Dashboard */}
                 <Route

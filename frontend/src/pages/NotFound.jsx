@@ -1,20 +1,21 @@
-import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Home, ArrowLeft, Search, Briefcase } from 'lucide-react';
 
 const NotFound = () => {
-  // In your actual implementation, you'll import these from react-router-dom
-  const navigate = (direction) => {
-    // navigate(-1) for going back
-    console.log('Navigate:', direction);
-  };
-  
+  const navigate = useNavigate();  // get the navigate function
+
   const Link = ({ to, children, className, ...props }) => {
-    // This is a mock Link component for the artifact
+    // Use real react-router-dom Link if possible, else fallback to <a>
     return (
-      <a href={to} className={className} {...props} onClick={(e) => {
-        e.preventDefault();
-        console.log('Navigate to:', to);
-      }}>
+      <a
+        href={to}
+        className={className}
+        {...props}
+        onClick={(e) => {
+          e.preventDefault();
+          navigate(to);
+        }}
+      >
         {children}
       </a>
     );
@@ -44,13 +45,13 @@ const NotFound = () => {
         {/* Action buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate(-1)}  // <-- real back navigation here
             className="flex items-center justify-center space-x-2 px-6 py-3 bg-white border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-lg"
           >
             <ArrowLeft className="h-5 w-5" />
             <span>Go Back</span>
           </button>
-          
+
           <Link
             to="/"
             className="flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
@@ -58,7 +59,7 @@ const NotFound = () => {
             <Home className="h-5 w-5" />
             <span>Go Home</span>
           </Link>
-          
+
           <Link
             to="/jobs"
             className="flex items-center justify-center space-x-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
@@ -88,7 +89,7 @@ const NotFound = () => {
                 Discover how JobHub works
               </div>
             </Link>
-            
+
             <Link
               to="/jobs"
               className="p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors text-left group"
@@ -104,9 +105,9 @@ const NotFound = () => {
         </div>
 
         {/* Floating animation elements */}
-        <div className="absolute top-20 left-20 w-20 h-20 bg-blue-200 rounded-full opacity-50 animate-bounce" style={{animationDelay: '0s'}}></div>
-        <div className="absolute top-40 right-32 w-16 h-16 bg-purple-200 rounded-full opacity-50 animate-bounce" style={{animationDelay: '0.5s'}}></div>
-        <div className="absolute bottom-32 left-32 w-12 h-12 bg-pink-200 rounded-full opacity-50 animate-bounce" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-20 left-20 w-20 h-20 bg-blue-200 rounded-full opacity-50 animate-bounce" style={{ animationDelay: '0s' }}></div>
+        <div className="absolute top-40 right-32 w-16 h-16 bg-purple-200 rounded-full opacity-50 animate-bounce" style={{ animationDelay: '0.5s' }}></div>
+        <div className="absolute bottom-32 left-32 w-12 h-12 bg-pink-200 rounded-full opacity-50 animate-bounce" style={{ animationDelay: '1s' }}></div>
         <div className="absolute bottom-20 right-20 w-24 h-24 bg-indigo-200 rounded-full opacity-30 animate-pulse"></div>
       </div>
     </div>

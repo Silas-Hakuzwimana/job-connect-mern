@@ -22,8 +22,13 @@ const forgotPassword = async (data) => {
 };
 
 const resetPassword = async ({ email, token, password }) => {
+  // Validate input
+  if (!email || !token || !password) {
+    throw new Error("Email, token, and password are required");
+  }
+  // Make the API call to reset password
   const res = await api.post(`/auth/reset-password/${token}`, {
-    email,
+    token,
     password,
   });
   return res.data;

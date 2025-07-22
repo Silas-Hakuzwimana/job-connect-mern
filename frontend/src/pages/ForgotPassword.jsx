@@ -1,4 +1,3 @@
-// pages/ForgotPassword.jsx
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -16,9 +15,9 @@ export default function ForgotPassword() {
         return emailRegex.test(email);
     };
 
-    
+
     const navigate = useNavigate();
-    const redirectTo =(url)=>{
+    const redirectTo = (url) => {
         navigate(url);
     }
 
@@ -57,11 +56,6 @@ export default function ForgotPassword() {
         }
     };
 
-    const handleResend = () => {
-        setEmailSent(false);
-        setEmail('');
-    };
-
     if (emailSent) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 sm:px-6 lg:px-8">
@@ -84,19 +78,12 @@ export default function ForgotPassword() {
                             <p className="text-sm text-gray-500">
                                 Didn't receive the email? Check your spam folder or
                             </p>
-
-                            <button
-                                onClick={handleResend}
-                                className="text-indigo-600 hover:text-indigo-500 font-medium text-sm transition-colors duration-200"
-                            >
-                                try another email address
-                            </button>
                         </div>
 
                         <div className="mt-8 pt-6 border-t border-gray-200">
                             <Link
                                 to="#"
-                                onClick={()=>redirectTo('/login')}
+                                onClick={() => redirectTo('/login')}
                                 className="inline-flex items-center text-indigo-600 hover:text-indigo-500 font-medium text-sm transition-colors duration-200"
                             >
                                 <ArrowLeft className="h-4 w-4 mr-2" />
