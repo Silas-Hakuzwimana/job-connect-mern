@@ -79,3 +79,16 @@ exports.deleteQualification = async (req, res) => {
     res.status(500).json({ error: 'Delete failed' });
   }
 };
+
+exports.getDashboardStats = async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const pendingCompanies = await User.countDocuments({ role: 'company', approved: false });
+    const pendingJobs = await Job.countDocuments({ status: 'pending' });
+    const totalApplications = await Application.countDocuments();
+
+    res.json({ totalUsers, pendingCompanies, pendingJobs, totalApplications });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to load stats' });
+  }
+};

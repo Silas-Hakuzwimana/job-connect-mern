@@ -1,9 +1,12 @@
-import AdminLayout from "../../layouts/AdminLayout";
 import { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import AdminLayout from "../../layouts/AdminLayout";
+import { getAdminStats } from "../../services/adminApis";
 
 export default function AdminDashboard() {
     const { user } = useContext(AuthContext);
+    const navigate = useNavigate();
 
     const [stats, setStats] = useState({
         totalUsers: 0,
@@ -14,90 +17,96 @@ export default function AdminDashboard() {
 
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        async function fetchStats() {
-            try {
-                const res = await fetch("/api/admin/dashboard-stats", {
-                    headers: { Authorization: `Bearer ${user?.token}` },
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    setStats(data);
-                } else {
-                    console.error("Failed to load stats");
-                }
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
+useEffect(() => {
+    const loadStats = async () => {
+        try {
+            const data = await getAdminStats();
+            setStats(data);
+        } catch (err) {
+            console.error("Failed to fetch admin stats:", err);
+        } finally {
+            setLoading(false);
         }
+    };
 
-        fetchStats();
-    }, [user]);
+    if (user?.token) {
+        loadStats();
+    } else {
+        setLoading(false); // Avoid infinite loading if user is not set
+    }
+}, [user]);
 
-    if (loading) return <div className="p-8 text-center">Loading dashboard...</div>;
+
+if (loading) {
+    return (
+        <div className="min-h-screen flex items-center justify-center">
+            <p className="text-gray-600 text-lg">Loading dashboard...</p>
+        </div>
+    );
+}
+
+return (
+    <AdminLayout>
+      
+        {/* Main Dashboard Content */}
+        <div className="max-w-7xl mx-auto px-4 py-8">
+            <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
+            <p className="text-gray-700 mb-8">
+                Welcome back, <span className="font-semibold">{user?.name}</span>
+            </p>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                <StatCard title="Total Users" value={stats.totalUsers} bgColor="bg-blue-600" />
+                <StatCard title="Companies Pending" value={stats.pendingCompanies} bgColor="bg-yellow-500" />
+                <StatCard title="Jobs Pending" value={stats.pendingJobs} bgColor="bg-green-600" />
+                <StatCard title="Total Applications" value={stats.totalApplications} bgColor="bg-purple-600" />
+            </div>
+
+            {/* Quick Actions */}
+            <section className="mb-12">
+                <h2 className="text-2xl font-semibold mb-4">Quick Actions</h2>
+                <div className="flex flex-wrap gap-4">
+                    <ActionButton text="Manage Users" color="blue" onClick={() => navigate("/admin/users")} />
+                    <ActionButton text="Approve Companies" color="yellow" onClick={() => navigate("/admin/companies")} />
+                    <ActionButton text="Approve Jobs" color="green" onClick={() => navigate("/admin/jobs")} />
+                    <ActionButton text="Send Email Notifications" color="purple" onClick={() => navigate("/admin/send-email")} />
+                </div>
+            </section>
+
+            {/* Recent Activities Placeholder */}
+            <section>
+                <h2 className="text-2xl font-semibold mb-4">Recent Activities</h2>
+                <p className="text-gray-500 italic">Coming soon: Activity logs, approvals, and notifications.</p>
+            </section>
+        </div>
+    </AdminLayout>
+);
+}
+
+// Reusable StatCard component
+function StatCard({ title, value, bgColor }) {
+    return (
+        <div className={`${bgColor} text-white rounded-lg p-6 shadow`}>
+            <h3 className="text-lg font-medium mb-1">{title}</h3>
+            <p className="text-3xl font-bold">{value}</p>
+        </div>
+    );
+}
+
+// Reusable ActionButton component
+function ActionButton({ text, color, onClick }) {
+    const base = "px-5 py-3 text-white rounded transition font-medium";
+    const bg = {
+        blue: "bg-blue-500 hover:bg-blue-600",
+        yellow: "bg-yellow-500 hover:bg-yellow-600",
+        green: "bg-green-500 hover:bg-green-600",
+        purple: "bg-purple-500 hover:bg-purple-600",
+    };
 
     return (
-        <AdminLayout>
-            <div className="max-w-7xl mx-auto px-4 py-8">
-                <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
-                <p className="mb-8">Welcome back, <span className="font-semibold">{user?.name}</span></p>
-
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-                    <div className="bg-blue-600 text-white rounded-lg p-6 shadow">
-                        <h2 className="text-lg font-semibold mb-2">Total Users</h2>
-                        <p className="text-3xl">{stats.totalUsers}</p>
-                    </div>
-                    <div className="bg-yellow-500 text-white rounded-lg p-6 shadow">
-                        <h2 className="text-lg font-semibold mb-2">Companies Pending Approval</h2>
-                        <p className="text-3xl">{stats.pendingCompanies}</p>
-                    </div>
-                    <div className="bg-green-600 text-white rounded-lg p-6 shadow">
-                        <h2 className="text-lg font-semibold mb-2">Jobs Pending Approval</h2>
-                        <p className="text-3xl">{stats.pendingJobs}</p>
-                    </div>
-                    <div className="bg-purple-600 text-white rounded-lg p-6 shadow">
-                        <h2 className="text-lg font-semibold mb-2">Total Applications</h2>
-                        <p className="text-3xl">{stats.totalApplications}</p>
-                    </div>
-                </div>
-
-                <section className="mb-10">
-                    <h2 className="text-2xl font-semibold mb-4">Quick Actions</h2>
-                    <div className="flex flex-wrap gap-4">
-                        <button
-                            onClick={() => window.location.href = "/admin/users"}
-                            className="px-5 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                        >
-                            Manage Users
-                        </button>
-                        <button
-                            onClick={() => window.location.href = "/admin/companies"}
-                            className="px-5 py-3 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition"
-                        >
-                            Approve Companies
-                        </button>
-                        <button
-                            onClick={() => window.location.href = "/admin/jobs"}
-                            className="px-5 py-3 bg-green-500 text-white rounded hover:bg-green-600 transition"
-                        >
-                            Approve Jobs
-                        </button>
-                        <button
-                            onClick={() => window.location.href = "/admin/send-email"}
-                            className="px-5 py-3 bg-purple-500 text-white rounded hover:bg-purple-600 transition"
-                        >
-                            Send Email Notifications
-                        </button>
-                    </div>
-                </section>
-
-                <section>
-                    <h2 className="text-2xl font-semibold mb-4">Recent Activities</h2>
-                    <p className="text-gray-600 italic">Coming soon: activity logs, recent approvals, and system notifications.</p>
-                </section>
-            </div>
-        </AdminLayout>
+        <button className={`${base} ${bg[color]}`} onClick={onClick}>
+            {text}
+        </button>
     );
 }

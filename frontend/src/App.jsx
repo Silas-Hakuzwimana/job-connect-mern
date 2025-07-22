@@ -25,6 +25,11 @@ import NotFound from "./pages/NotFound";
 import JobSeekerDashboard from "./pages/jobseeker/JobSeekerDashboard";
 import CompanyDashboard from "./pages/company/CompanyDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import UserManagement from "./components/admin/UserManagement";
+import JobManagement from "./components/admin/JobManagement";
+import ApplicationManagement from "./components/admin/ApplicationManager";
+import AdminLayout from "./layouts/AdminLayout";
+import AdminNavbar from "./components/admin/AdminNavbar";
 
 
 // ------------------------
@@ -33,49 +38,49 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 
 // Full-page loading UI
 function LoadingPage() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
-        <p className="text-gray-600">Loading...</p>
-      </div>
-    </div>
-  );
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+            <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
+                <p className="text-gray-600">Loading...</p>
+            </div>
+        </div>
+    );
 }
 
 // Protected route wrapper
 function ProtectedRoute({ children, roles, fallbackPath = "/" }) {
-  const { user, loading } = useContext(AuthContext);
+    const { user, loading } = useContext(AuthContext);
 
-  if (loading) return <LoadingPage />;
+    if (loading) return <LoadingPage />;
 
-  if (!user) {
-    return <Navigate to={`/login?returnTo=${encodeURIComponent(window.location.pathname)}`} replace />;
-  }
+    if (!user) {
+        return <Navigate to={`/login?returnTo=${encodeURIComponent(window.location.pathname)}`} replace />;
+    }
 
-  if (roles && !roles.includes(user.role)) {
-    return <Navigate to={fallbackPath} replace />;
-  }
+    if (roles && !roles.includes(user.role)) {
+        return <Navigate to={fallbackPath} replace />;
+    }
 
-  return children;
+    return children;
 }
 
 // Public-only route (redirect if logged in)
 function PublicRoute({ children }) {
-  const { user, loading } = useContext(AuthContext);
+    const { user, loading } = useContext(AuthContext);
 
-  if (loading) return <LoadingPage />;
+    if (loading) return <LoadingPage />;
 
-  if (user) {
-    const dashboardPaths = {
-      admin: "/admin",
-      company: "/company/dashboard",
-      jobseeker: "/jobseeker/dashboard",
-    };
-    return <Navigate to={dashboardPaths[user.role] || "/"} replace />;
-  }
+    if (user) {
+        const dashboardPaths = {
+            admin: "/admin",
+            company: "/company/dashboard",
+            jobseeker: "/jobseeker/dashboard",
+        };
+        return <Navigate to={dashboardPaths[user.role] || "/"} replace />;
+    }
 
-  return children;
+    return children;
 }
 
 
@@ -84,91 +89,103 @@ function PublicRoute({ children }) {
 // ------------------------
 
 export default function App() {
-  return (
-    <>
-      {/* Toast Notifications */}
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="colored"
-      />
+    return (
+        <>
+            {/* Toast Notifications */}
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored"
+            />
 
-      {/* Route Definitions */}
-      <Routes>
+            {/* Route Definitions */}
+            <Routes>
 
-        {/* Public Routes */}
-        <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-        <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
-        <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
-        <Route path="/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
-        <Route path="/logout" element={<Logout />} />
+                {/* Public Routes */}
+                <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+                <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+                <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+                <Route path="/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
+                <Route path="/logout" element={<Logout />} />
 
-        {/* Public Home Page */}
-        <Route path="/" element={<Layout><Home /></Layout>} />
+                {/* Public Home Page */}
+                <Route path="/" element={<Layout><Home /></Layout>} />
 
-        {/* Job Pages (protected for all roles) */}
-        <Route
-          path="/jobs"
-          element={
-            <ProtectedRoute roles={["jobseeker", "company", "admin"]}>
-              <Layout><Jobs /></Layout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/jobs/:id"
-          element={
-            <ProtectedRoute roles={["jobseeker", "company", "admin"]}>
-              <Layout><JobDetails /></Layout>
-            </ProtectedRoute>
-          }
-        />
+                {/* Job Pages (protected for all roles) */}
+                <Route
+                    path="/jobs"
+                    element={
+                        <ProtectedRoute roles={["jobseeker", "company", "admin"]}>
+                            <Layout>
+                                <Jobs />
+                            </Layout>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/jobs/:id"
+                    element={
+                        <ProtectedRoute roles={["jobseeker", "company", "admin"]}>
+                            <Layout><JobDetails /></Layout>
+                        </ProtectedRoute>
+                    }
+                />
 
-        {/* Profile Page */}
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute roles={["jobseeker", "company", "admin"]}>
-              <Layout><Profile /></Layout>
-            </ProtectedRoute>
-          }
-        />
+                {/* Profile Page */}
+                <Route
+                    path="/profile"
+                    element={
+                        <ProtectedRoute roles={["jobseeker", "company", "admin"]}>
+                            <Layout><Profile /></Layout>
+                        </ProtectedRoute>
+                    }
+                />
 
-        {/* Dashboards by Role */}
-        <Route
-          path="/jobseeker/*"
-          element={
-            <ProtectedRoute roles={["jobseeker"]} fallbackPath="/jobseeker/dashboard">
-              <JobSeekerDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/company/dashboard"
-          element={
-            <ProtectedRoute roles={["company"]} fallbackPath="/company/dashboard">
-              <CompanyDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/*"
-          element={
-            <ProtectedRoute roles={["admin"]} fallbackPath="/admin/dashboard">
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
+                {/* Dashboards by Role */}
+                <Route
+                    path="/jobseeker/dashboard"
+                    element={
+                        <ProtectedRoute roles={["jobseeker"]} fallbackPath="/jobseeker/dashboard">
+                            <JobSeekerDashboard />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/company/dashboard"
+                    element={
+                        <ProtectedRoute roles={["company"]} fallbackPath="/company/dashboard">
+                            <CompanyDashboard />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/dashboard"
+                    element={
+                        <ProtectedRoute roles={["admin"]} fallbackPath="/admin/dashboard">
+                            <AdminDashboard />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route path="/admin" element={
+                    <AdminLayout />
+                    
+                    }>
+                    <Route index element={<AdminDashboard />} />
+                    <Route path="users" element={<UserManagement />} />
+                    <Route path="jobs" element={<JobManagement />} />
+                    <Route path="applications" element={<ApplicationManagement />} />
+                </Route>
 
-        {/* 404 Catch-All */}
-        <Route path="*" element={<Layout><NotFound /></Layout>} />
-      </Routes>
-    </>
-  );
+
+                {/* 404 Catch-All */}
+                <Route path="*" element={<Layout><NotFound /></Layout>} />
+            </Routes>
+        </>
+    );
 }

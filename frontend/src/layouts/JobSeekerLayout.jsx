@@ -1,6 +1,6 @@
 import JobSeekerHeader from "../components/headers/JobSeekerHeader";
 import JobSeekerFooter from "../components/footers/JobSeekerFooter";
-import JobSeekerNavbar from "../components/jobseekerComponents/JobSeekerNavBar";
+import JobSeekerNavbar from "../components/jobseeker/JobSeekerNavBar";
 
 export default function JobSeekerLayout({ children }) {
     return (
