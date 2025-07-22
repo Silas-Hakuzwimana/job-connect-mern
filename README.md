@@ -52,13 +52,17 @@ JobConnect is a MERN stack job portal connecting job seekers with employers. It 
 
 backend/
 ├── config/
-├── controllers/
+├── docs/
+├── logs/
 ├── middlewares/
+├── controllers/
 ├── models/
 ├── routes/
 ├── utils/
 ├── server.js
 └── .env
+└── .gitignore
+└── structure.txt
 
 frontend/
 ├── public/
@@ -69,9 +73,15 @@ frontend/
 │   ├── pages/
 │   ├── services/
 │   ├── App.jsx
+|   ├── index.css
 │   └── main.jsx
 ├── tailwind.config.js
-└── package.json
+└── .env
+└── .gitignore
+└── postcss.config.js
+└── eslint.config.js
+└── README.md
+└── vite.config.js
 
 ```
 
