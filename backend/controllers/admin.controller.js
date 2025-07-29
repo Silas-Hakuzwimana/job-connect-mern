@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Job = require('../models/Job');
 const Application = require('../models/Application');
 const Qualification = require('../models/Qualification');
+const Company = require('../models/Company');
 
 // Get all users
 exports.getAllUsers = async (req, res) => {
@@ -132,7 +133,7 @@ exports.getDashboardStats = async (req, res) => {
   try {
     const totalUsers = await User.countDocuments();
     const totalJobseekers = await User.countDocuments({ role: 'jobseeker' });
-    const totalCompanies = await User.countDocuments({ role: 'company' });
+    const totalCompanies = await Company.countDocuments();
     const totalAdmins = await User.countDocuments({ role: 'admin' });
     const pendingCompanies = await User.countDocuments({
       role: 'company',
