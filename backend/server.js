@@ -22,6 +22,7 @@ const applicationRoutes = require('./routes/application.routes');
 const adminRoutes = require('./routes/admin.routes');
 const bookmarkRoutes = require('./routes/bookmark.routes.js');
 const jobSeekerRoutes = require('./routes/jobseeker.routes.js');
+const companyRoutes = require('./routes/company.routes.js');
 
 // Swagger Documentation
 const swaggerDocument = YAML.load('./docs/swagger.yaml');
@@ -69,6 +70,7 @@ app.use('/api/applications', applicationRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/bookmarks', bookmarkRoutes);
 app.use('/api/jobseeker', jobSeekerRoutes);
+app.use('/api/companies', companyRoutes);
 
 // API Docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
