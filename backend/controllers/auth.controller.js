@@ -21,28 +21,39 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email });
+  try {
+    const { email, password } = req.body;
 
-  console.log('login user:', user);
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
 
-  if (!user || !(await user.comparePassword(password))) {
-    return res.status(401).json({ error: 'Invalid credentials' });
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.otp = otp;
+    user.otpExpiresAt = Date.now() + 10 * 60 * 1000; // 10 mins
+    await user.save();
+
+    // Send OTP email
+    const firstName = user.name?.split(' ')[0] || 'User';
+    await sendOTPEmail(user.email, firstName, otp);
+
+    return res.status(200).json({ message: 'OTP sent to your email' });
+  } catch (error) {
+    console.error('Login error:', error);
+    return res.status(500).json({ error: 'Server error during login' });
   }
-
-  // Generate OTP
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  user.otp = otp;
-  user.otpExpiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
-  await user.save();
-
-  // Extract first name
-  const firstName = user.name?.split(' ')[0] || 'User';
-
-  // Send OTP email
-  await sendOTPEmail(user.email, firstName, otp);
-
-  res.status(200).json({ message: 'OTP sent to your email' });
 };
 
 exports.verifyOTP = async (req, res) => {
@@ -78,15 +89,23 @@ exports.verifyOTP = async (req, res) => {
     const token = generateToken(user);
 
     // Send response
-    res.status(200).json({
-      user: {
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        id: user._id,
-      },
-      token,
-    });
+    res
+      .cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'development',
+        //sameSite: 'Strict', // or 'Lax' depending on frontend/backend domains
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+      })
+      .status(200)
+      .json({
+        user: {
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          id: user._id,
+        },
+        token, // optional, for frontend localStorage if you want
+      });
     console.log(`User data : \n ${user}`);
   } catch (error) {
     console.error('verifyOTP error:', error.message);
@@ -156,7 +175,7 @@ exports.logout = (req, res) => {
   res.clearCookie('token', {
     httpOnly: true,
     sameSite: 'Strict',
-    secure: process.env.NODE_ENV === 'production', // Optional: for production
+    secure: process.env.NODE_ENV === 'development', // Optional: for production
   });
   res.status(200).json({ message: 'Logged out successfully' });
 };

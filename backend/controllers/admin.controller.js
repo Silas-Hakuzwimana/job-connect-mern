@@ -38,8 +38,50 @@ exports.deleteUser = async (req, res) => {
 
 // Get all jobs
 exports.getAllJobs = async (req, res) => {
-  const jobs = await Job.find().populate('postedBy', 'name email');
+  const jobs = await Job.find().populate('postedBy');
   res.json(jobs);
+};
+
+exports.approveJob = async (req, res) => {
+  try {
+    const { jobId } = req.params;
+
+    const job = await Job.findByIdAndUpdate(
+      jobId,
+      { status: 'approved' },
+      { new: true }
+    );
+
+    if (!job) {
+      return res.status(404).json({ message: 'Job not found' });
+    }
+
+    res.status(200).json({ message: 'Job approved', job });
+  } catch (error) {
+    console.error('Error approving job:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+exports.rejectJob = async (req, res) => {
+  try {
+    const { jobId } = req.params;
+
+    const job = await Job.findByIdAndUpdate(
+      jobId,
+      { status: 'rejected' },
+      { new: true }
+    );
+
+    if (!job) {
+      return res.status(404).json({ message: 'Job not found' });
+    }
+
+    res.status(200).json({ message: 'Job rejected', job });
+  } catch (error) {
+    console.error('Error rejecting job:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
 // Delete job

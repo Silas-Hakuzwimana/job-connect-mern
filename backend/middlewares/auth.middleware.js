@@ -1,17 +1,29 @@
 const jwt = require('jsonwebtoken');
-const  User = require('../models/User');
+const User = require('../models/User');
 
 exports.auth = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Unauthorized: No token provided' });
+  // Try to get token from cookie
+  let token = req.cookies?.token;
+
+  // Fallback to Authorization header if no cookie token
+  if (!token) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res
+        .status(401)
+        .json({ message: 'Unauthorized: No token provided' });
+    }
+    token = authHeader.split(' ')[1];
   }
 
-  const token = authHeader.split(' ')[1];
-  console.log("Token:", token);
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id); 
+    if (!decoded || !decoded.id) {
+      return res
+        .status(401)
+        .json({ message: 'Unauthorized: Invalid token payload' });
+    }
+    req.user = await User.findById(decoded.id);
     next();
   } catch (err) {
     return res.status(401).json({ message: 'Unauthorized: Invalid token' });
@@ -27,40 +39,45 @@ exports.restrictTo = (...roles) => {
   };
 };
 
-
 exports.verifyAdmin = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "No token provided" });
+  let token = req.cookies?.token;
+
+  if (!token) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: 'No token provided' });
+    }
+    token = authHeader.split(' ')[1];
   }
 
-  const token = authHeader.split(" ")[1];
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (decoded.role !== "admin") {
-      return res.status(403).json({ message: "Not authorized as admin" });
+    if (decoded.role !== 'admin') {
+      return res.status(403).json({ message: 'Not authorized as admin' });
     }
     req.user = decoded;
     next();
   } catch (err) {
-    return res.status(401).json({ message: "Invalid token" });
+    return res.status(401).json({ message: 'Invalid token' });
   }
 };
 
 exports.authenticateJobSeeker = (req, res, next) => {
-  const authHeader = req.headers.authorization;
+  let token = req.cookies?.token;
 
-  if (!authHeader?.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Unauthorized" });
+  if (!token) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    token = authHeader.split(' ')[1];
   }
-
-  const token = authHeader.split(" ")[1];
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Add job seeker data to request
+    req.user = decoded;
     next();
   } catch (err) {
-    return res.status(403).json({ error: "Invalid token" });
+    return res.status(403).json({ error: 'Invalid token' });
   }
 };

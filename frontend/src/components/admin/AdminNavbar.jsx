@@ -33,9 +33,9 @@ export default function AdminNavbar() {
 
   const navLinks = [
     { label: "Dashboard", icon: <BarChart2 size={18} />, to: "/admin/dashboard" },
-    { label: "Users", icon: <Users size={18} />, to: "/admin/users" },
-    { label: "Jobs", icon: <Briefcase size={18} />, to: "/admin/jobs" },
-    { label: "Applications", icon: <FileText size={18} />, to: "/admin/applications" },
+    { label: "Users", icon: <Users size={18} />, to: "/admin/dashboard/users" },
+    { label: "Jobs", icon: <Briefcase size={18} />, to: "/admin/dashboard/jobs" },
+    { label: "Applications", icon: <FileText size={18} />, to: "/admin/dashboard/applications" },
   ];
 
   return (
