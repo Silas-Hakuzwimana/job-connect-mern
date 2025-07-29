@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import IndustrySelect from './IndustrySelect';
 
 export default function CompanyForm({ initialData = {}, onSave, onCancel }) {
   const [form, setForm] = useState({
@@ -41,14 +42,7 @@ export default function CompanyForm({ initialData = {}, onSave, onCancel }) {
         required
       />
 
-      <input
-        type="text"
-        name="industry"
-        placeholder="Industry"
-        value={form.industry}
-        onChange={handleChange}
-        className="w-full border rounded px-3 py-2"
-      />
+      <IndustrySelect value={form.industry} onChange={handleChange} />
 
       <input
         type="url"

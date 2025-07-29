@@ -19,6 +19,7 @@ import Logout from "./pages/Logout";
 import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";
 import Profile from "./pages/Profile";
+import CompanyManager from "./pages/admin/CompanyManager";
 import NotFound from "./pages/NotFound";
 
 // Dashboards by role
@@ -190,6 +191,9 @@ export default function App() {
 
           {/* /admin/dashboard/applications */}
           <Route path="applications" element={<ApplicationManagement />} />
+
+          {/* /admin/dashboard/companies */}
+          <Route path="companies" element={<CompanyManager />} />
         </Route>
 
 

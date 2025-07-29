@@ -36,6 +36,7 @@ export default function AdminNavbar() {
     { label: "Users", icon: <Users size={18} />, to: "/admin/dashboard/users" },
     { label: "Jobs", icon: <Briefcase size={18} />, to: "/admin/dashboard/jobs" },
     { label: "Applications", icon: <FileText size={18} />, to: "/admin/dashboard/applications" },
+    { label: "Companies", icon: <FileText size={18} />, to: "/admin/dashboard/companies" },
   ];
 
   return (
