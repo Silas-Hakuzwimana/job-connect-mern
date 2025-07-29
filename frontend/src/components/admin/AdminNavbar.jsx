@@ -1,14 +1,24 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { Menu,  LogOut, BarChart2, Users, Briefcase, FileText } from "lucide-react";
+import { useEffect, useState, useContext } from "react";
+import { toast } from "react-toastify";
+import { Menu, LogOut, BarChart2, Users, Briefcase, FileText } from "lucide-react";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function AdminNavbar() {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const { logout } = useContext(AuthContext);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success("Logged out successfully");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast.error("Logout failed");
+    } finally {
+      navigate("/login");
+    }
   };
 
   const toggleMobileMenu = () => {
@@ -44,8 +54,7 @@ export default function AdminNavbar() {
               key={link.to}
               to={link.to}
               className={({ isActive }) =>
-                `flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium ${
-                  isActive ? "text-blue-600 font-semibold" : "text-gray-700 hover:text-blue-600"
+                `flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium ${isActive ? "text-blue-600 font-semibold" : "text-gray-700 hover:text-blue-600"
                 }`
               }
             >
@@ -80,8 +89,7 @@ export default function AdminNavbar() {
               to={link.to}
               onClick={() => setMobileMenuOpen(false)}
               className={({ isActive }) =>
-                `block px-3 py-2 rounded-md text-sm font-medium ${
-                  isActive ? "text-blue-600 font-semibold" : "text-gray-700 hover:text-blue-600"
+                `block px-3 py-2 rounded-md text-sm font-medium ${isActive ? "text-blue-600 font-semibold" : "text-gray-700 hover:text-blue-600"
                 }`
               }
             >

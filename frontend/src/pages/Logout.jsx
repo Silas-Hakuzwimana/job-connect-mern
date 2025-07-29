@@ -1,30 +1,32 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AuthContext } from "../context/AuthContext";
-import LoadingSpinner from "../components/LoadingSpinner";
 
 export default function Logout() {
   const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    try {
-      await axios.get("/api/auth/logout", { withCredentials: true });
-      logout(); 
-      toast.success("Logged out successfully");
-      navigate("/");
-    } catch (error) {
-      toast.error(`Logout failed: ${error.message}`);
-    }
-  };
+  const hasLoggedOut = useRef(false); // ✅ guard
 
   useEffect(() => {
-    handleLogout();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [logout, navigate]);
-  return null;
+    const handleLogout = async () => {
+      if (hasLoggedOut.current) return; // ✅ prevent double call
+      hasLoggedOut.current = true;
 
- // return <LoadingSpinner />; 
+      try {
+        await axios.get("/api/auth/logout", { withCredentials: true });
+        logout();
+        toast.success("Logged out successfully");
+      } catch (error) {
+        toast.error(`Logout failed: ${error.message}`);
+      } finally {
+        navigate("/login"); // move navigation to finally to ensure it happens once
+      }
+    };
+
+    handleLogout();
+  }, [logout, navigate]);
+
+  return null; // or return <LoadingSpinner />
 }

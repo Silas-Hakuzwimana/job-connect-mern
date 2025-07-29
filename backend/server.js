@@ -19,6 +19,8 @@ const userRoutes = require('./routes/user.routes');
 const qualificationRoutes = require('./routes/qualification.routes');
 const applicationRoutes = require('./routes/application.routes');
 const adminRoutes = require('./routes/admin.routes');
+const bookmarkRoutes = require('./routes/bookmark.routes.js');
+const jobSeekerRoutes = require('./routes/jobseeker.routes.js');
 
 // Swagger Documentation
 const swaggerDocument = YAML.load('./docs/swagger.yaml');
@@ -59,6 +61,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/qualifications', qualificationRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/bookmarks',bookmarkRoutes);
+app.use('/api/jobseeker', jobSeekerRoutes);
 
 // API Docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
