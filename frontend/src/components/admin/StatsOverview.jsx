@@ -4,12 +4,12 @@ import {
   HiUsers,
   HiUserGroup,
   HiOfficeBuilding,
-  HiUserCheck,
   HiClock,
   HiBriefcase,
   HiCheckCircle,
   HiXCircle,
   HiClipboardList,
+  HiUserCircle,
 } from 'react-icons/hi';
 
 export default function StatsOverview() {
@@ -53,7 +53,7 @@ export default function StatsOverview() {
       id: 'totalAdmins',
       label: 'Total Admins',
       value: stats.totalAdmins,
-      icon: <HiUserCheck className="w-8 h-8 text-green-600" />,
+      icon: <HiUserCircle className="w-8 h-8 text-green-600" />,
     },
     {
       id: 'pendingCompanies',
