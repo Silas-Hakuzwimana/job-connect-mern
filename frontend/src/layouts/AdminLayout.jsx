@@ -9,6 +9,7 @@ export default function AdminLayout() {
       <AdminHeader />
       <AdminNavbar />
       <main className="flex-1 bg-gray-50 p-6">
+        {/* Render child route components here */}
         <Outlet />
       </main>
       <AdminFooter />

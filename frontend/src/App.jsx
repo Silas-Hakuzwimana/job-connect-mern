@@ -179,11 +179,19 @@ export default function App() {
             </ProtectedRoute>
           }
         >
+          {/* This means: /admin/dashboard shows AdminDashboard */}
           <Route index element={<AdminDashboard />} />
+
+          {/* /admin/dashboard/users */}
           <Route path="users" element={<UserManagement />} />
+
+          {/* /admin/dashboard/jobs */}
           <Route path="jobs" element={<JobManagement />} />
+
+          {/* /admin/dashboard/applications */}
           <Route path="applications" element={<ApplicationManagement />} />
         </Route>
+
 
         {/* 404 Page */}
         <Route path="*" element={<NotFound />} />

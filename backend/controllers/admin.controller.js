@@ -49,7 +49,7 @@ exports.approveJob = async (req, res) => {
     const job = await Job.findByIdAndUpdate(
       jobId,
       { status: 'approved' },
-      { new: true }
+      { new: true },
     );
 
     if (!job) {
@@ -70,7 +70,7 @@ exports.rejectJob = async (req, res) => {
     const job = await Job.findByIdAndUpdate(
       jobId,
       { status: 'rejected' },
-      { new: true }
+      { new: true },
     );
 
     if (!job) {
@@ -125,11 +125,31 @@ exports.deleteQualification = async (req, res) => {
 exports.getDashboardStats = async (req, res) => {
   try {
     const totalUsers = await User.countDocuments();
-    const pendingCompanies = await User.countDocuments({ role: 'company', approved: false });
+    const totalJobseekers = await User.countDocuments({ role: 'jobseeker' });
+    const totalCompanies = await User.countDocuments({ role: 'company' });
+    const totalAdmins = await User.countDocuments({ role: 'admin' });
+    const pendingCompanies = await User.countDocuments({
+      role: 'company',
+      approved: false,
+    });
     const pendingJobs = await Job.countDocuments({ status: 'pending' });
+    const totalJobs = await Job.countDocuments();
+    const approvedJobs = await Job.countDocuments({ status: 'approved' });
+    const rejectedJobs = await Job.countDocuments({ status: 'rejected' });
     const totalApplications = await Application.countDocuments();
 
-    res.json({ totalUsers, pendingCompanies, pendingJobs, totalApplications });
+    res.json({
+      totalUsers,
+      totalJobseekers,
+      totalCompanies,
+      totalAdmins,
+      pendingCompanies,
+      pendingJobs,
+      totalJobs,
+      approvedJobs,
+      rejectedJobs,
+      totalApplications,
+    });
   } catch (err) {
     res.status(500).json({ error: 'Failed to load stats' });
   }
