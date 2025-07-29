@@ -98,10 +98,16 @@ exports.deleteJob = async (req, res) => {
 
 // View all applications
 exports.getAllApplications = async (req, res) => {
-  const applications = await Application.find()
-    .populate('applicant', 'name email')
-    .populate('job', 'title');
-  res.json(applications);
+  try {
+    const applications = await Application.find()
+      .populate('applicant', 'name email') // <-- Ensure only the necessary fields are loaded
+      .populate('job', 'title company');
+
+    res.json(applications);
+  } catch (error) {
+    console.error('Error fetching applications:', error);
+    res.status(500).json({ message: 'Failed to fetch applications' });
+  }
 };
 
 // View all qualifications
