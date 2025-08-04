@@ -18,12 +18,19 @@ import Logout from "./pages/Logout";
 // Authenticated general pages
 import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";
-import Profile from "./pages/Profile";
+import Profiles from "./pages/Profiles";
 import CompanyManager from "./pages/admin/CompanyManager";
 import NotFound from "./pages/NotFound";
 
 // Dashboards by role
 import JobSeekerDashboard from "./pages/jobseeker/JobSeekerDashboard";
+
+//Components
+import Applications from "./components/jobseeker/Applications";
+import Notifications from "./components/jobseeker/Notifications";
+import Profile from "./components/jobseeker/Profile";
+import Qualifications from "./components/jobseeker/Qualiifcations";
+
 import CompanyDashboard from "./pages/company/CompanyDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./components/admin/UserManagement";
@@ -32,6 +39,8 @@ import ApplicationManagement from "./components/admin/ApplicationManager";
 import AdminLayout from "./layouts/AdminLayout";
 import JobSeekerLayout from "./layouts/JobSeekerLayout";
 import BookMark from "./components/jobseeker/BookMark";
+import Settings from "./components/jobseeker/Settings";
+
 
 
 // ------------------------
@@ -158,7 +167,10 @@ export default function App() {
           <Route path="bookmarks" element={<BookMark />} />
           <Route path="profile" element={<Profile />} />
           <Route path="jobs" element={<Jobs />} />
+          <Route path="applications" element={< Applications />} />
+          <Route path="settings" element={<Settings />} />
           <Route path="jobs/:id" element={<JobDetails />} />
+          <Route path="qualifications" element={<Qualifications />} />
         </Route>
 
         {/* ✅ Company Dashboard (Simple) */}

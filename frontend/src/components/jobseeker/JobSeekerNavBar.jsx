@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Briefcase, User } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 
 
 export default function JobSeekerNavbar({ notificationsCount = 0 }) {
@@ -12,16 +12,16 @@ export default function JobSeekerNavbar({ notificationsCount = 0 }) {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-      try {
-        await logout();
-        toast.success("Logged out successfully");
-      } catch (error) {
-        console.error("Logout failed:", error);
-        toast.error("Logout failed");
-      } finally {
-        navigate("/login");
-      }
-    };
+    try {
+      await logout();
+      toast.success("Logged out successfully");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast.error("Logout failed");
+    } finally {
+      navigate("/login");
+    }
+  };
 
   const profileImg = user?.profilePicture || null;
 
@@ -42,6 +42,7 @@ export default function JobSeekerNavbar({ notificationsCount = 0 }) {
                 { name: "Browse Jobs", to: "/jobseeker/dashboard/jobs" },
                 { name: "Bookmarks", to: "/jobseeker/dashboard/bookmarks" },
                 { name: "Applications", to: "/jobseeker/dashboard/applications" },
+                { name: "Qualifications", to: "/jobseeker/dashboard/qualifications" },
               ].map(({ name, to }) => (
                 <NavLink
                   key={to}
@@ -68,7 +69,7 @@ export default function JobSeekerNavbar({ notificationsCount = 0 }) {
             />
 
             {/* Notifications */}
-            <Link to="/notifications" className="relative text-gray-600 hover:text-gray-800">
+            <Link to="/jobseeker/dashboard/notifications" className="relative text-gray-600 hover:text-gray-800">
               <svg
                 className="h-6 w-6"
                 fill="none"
@@ -164,6 +165,7 @@ export default function JobSeekerNavbar({ notificationsCount = 0 }) {
             { name: "Browse Jobs", to: "/jobseeker/dashboard/jobs" },
             { name: "Bookmarks", to: "/jobseeker/dashboard/bookmarks" },
             { name: "Applications", to: "/jobseeker/dashboard/applications" },
+            { name: "Qualifications", to: "/jobseeker/dashboard/qualifications" },
             { name: "Profile & Resume", to: "/jobseeker/dashboard/profile" },
             { name: "Settings", to: "/jobseeker/dashboard/settings" },
             { name: "Logout", to: "/logout", isDanger: true },

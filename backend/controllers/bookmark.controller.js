@@ -42,3 +42,30 @@ exports.removeBookmark = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getDashboardStats = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    // Count total bookmarks for this user
+    const totalBookmarks = await Bookmark.countDocuments({ userId });
+
+    // Count bookmarks specifically for jobs
+    const jobBookmarks = await Bookmark.countDocuments({ userId, itemType: 'job' });
+
+    // Count bookmarks specifically for applications
+    const applicationBookmarks = await Bookmark.countDocuments({ userId, itemType: 'application' });
+
+    res.status(200).json({
+      totalBookmarks,
+      jobBookmarks,
+      applicationBookmarks,
+      message: 'Jobseeker dashboard stats loaded successfully'
+    });
+
+  } catch (error) {
+    console.error('🔥 Error loading dashboard stats:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
