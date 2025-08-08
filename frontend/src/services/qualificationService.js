@@ -1,9 +1,14 @@
 import api from './api';
 
 // GET all qualifications
-export const  fetchAllQualifications = async () => {
+export const fetchAllQualifications = async () => {
   const res = await api.get('/qualifications');
   return res.data;
+};
+
+export const fetchUserQualifications = async () => {
+  const res = await api.get('qualifications/me');
+  return res.data.qualifications; 
 };
 
 // GET a qualification by ID

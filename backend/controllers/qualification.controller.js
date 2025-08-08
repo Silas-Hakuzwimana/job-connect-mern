@@ -48,7 +48,7 @@ exports.saveUserQualifications = async (req, res) => {
     // Fetch existing qualifications
     const savedQuals = await Qualification.find({
       title: { $in: qualifications },
-      createdBy: user._id
+      createdBy: user._id,
     });
 
     // Determine which titles are new
@@ -91,6 +91,27 @@ exports.getAllQualifications = async (req, res) => {
     return res
       .status(500)
       .json({ error: 'Server error while fetching qualifications' });
+  }
+};
+
+exports.getUserQualifications = async (req, res) => {
+  try {
+    const userId = req.user.id; 
+
+    // Find user and populate qualifications (only title and description, or whatever you want)
+    const user = await User.findById(userId)
+      .populate('qualifications', 'title')
+      .select('-password'); 
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Return qualifications only or whole user with qualifications
+    return res.status(200).json({ qualifications: user.qualifications });
+  } catch (error) {
+    console.error('Error fetching user qualifications:', error);
+    return res.status(500).json({ error: 'Server error' });
   }
 };
 
