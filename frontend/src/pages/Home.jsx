@@ -1,4 +1,4 @@
-import { useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Users, Building2, Shield, ChevronRight, Star, CheckCircle, TrendingUpDown } from 'lucide-react';
 
@@ -12,24 +12,24 @@ export default function Home() {
     const duration = 2000;
     const steps = 60;
     const stepTime = duration / steps;
-    
+
     let currentStep = 0;
     const timer = setInterval(() => {
       currentStep++;
       const progress = currentStep / steps;
-      
+
       setStatsCount({
         jobs: Math.floor(targetStats.jobs * progress),
         companies: Math.floor(targetStats.companies * progress),
         users: Math.floor(targetStats.users * progress)
       });
-      
+
       if (currentStep >= steps) {
         clearInterval(timer);
         setStatsCount(targetStats);
       }
     }, stepTime);
-    
+
     return () => clearInterval(timer);
   }, []);
 
@@ -78,8 +78,8 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-2xl mx-auto mb-12">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder="Job title, keywords, or company"
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
@@ -88,7 +88,7 @@ export default function Home() {
               Search Jobs
             </button>
           </div>
-          
+
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div className="text-center">
@@ -117,7 +117,7 @@ export default function Home() {
             Powerful tools designed to make job searching and hiring effortless
           </p>
         </div>
-        
+
         <div className="grid gap-8 md:grid-cols-3">
           {/* Job Seekers */}
           <div className="group p-8 bg-white border border-gray-200 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
@@ -214,7 +214,7 @@ export default function Home() {
               Simple steps to connect talent with opportunity
             </p>
           </div>
-          
+
           <div className="grid gap-8 md:grid-cols-3">
             <div className="text-center">
               <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">1</div>
@@ -238,27 +238,27 @@ export default function Home() {
 
       {/* Testimonials */}
       <section className="py-16 px-10">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">What Our Users Say</h2>
-            <p className="text-xl text-gray-600">Join thousands of satisfied job seekers and employers</p>
-          </div>
-          
-          <div className="grid gap-8 md:grid-cols-3">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
-                <div className="flex mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-gray-700 mb-4 italic">"{testimonial.content}"</p>
-                <div>
-                  <div className="font-semibold text-gray-900">{testimonial.name}</div>
-                  <div className="text-gray-600">{testimonial.role} at {testimonial.company}</div>
-                </div>
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold mb-4">What Our Users Say</h2>
+          <p className="text-xl text-gray-600">Join thousands of satisfied job seekers and employers</p>
+        </div>
+
+        <div className="grid gap-8 md:grid-cols-3">
+          {testimonials.map((testimonial, index) => (
+            <div key={index} className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+              <div className="flex mb-4">
+                {[...Array(testimonial.rating)].map((_, i) => (
+                  <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                ))}
               </div>
-            ))}
-          </div>
+              <p className="text-gray-700 mb-4 italic">"{testimonial.content}"</p>
+              <div>
+                <div className="font-semibold text-gray-900">{testimonial.name}</div>
+                <div className="text-gray-600">{testimonial.role} at {testimonial.company}</div>
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* CTA Section */}
@@ -266,7 +266,7 @@ export default function Home() {
         <div className="px-10 text-center">
           <h2 className="text-4xl font-bold mb-4">Ready to Get Started?</h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Join JobHub today and take the next step in your career journey
+            Join JobConnect today and take the next step in your career journey
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="px-8 py-4 bg-white text-blue-600 rounded-lg hover:bg-gray-100 transition-colors font-semibold" onClick={() => redirectTo('/login')}>

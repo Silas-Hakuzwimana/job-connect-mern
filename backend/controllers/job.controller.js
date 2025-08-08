@@ -1,4 +1,5 @@
 const Job = require("../models/Job");
+const Qualification  = require('../models/Qualification');
 
 exports.createJob = async (req, res) => {
   try {
@@ -59,5 +60,39 @@ exports.deleteJob = async (req, res) => {
     res.json({ message: "Job deleted successfully" });
   } catch {
     res.status(400).json({ error: "Deletion failed" });
+  }
+};
+
+
+exports.getJobsWithQualificationMatch = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // 1. Get all qualifications owned by user
+    const userQualifications = await Qualification.find({ createdBy: userId });
+    const userQualTitles = userQualifications.map(q => q.title);
+
+    // 2. Fetch jobs that are active and approved
+    const jobs = await Job.find({ isActive: true, status: 'approved' });
+
+    // 3. Compare qualifications for each job
+    const jobsWithMatchInfo = jobs.map(job => {
+      // job.qualifications is array of required qualification titles
+      const matchedQualifications = job.qualifications.filter(q =>
+        userQualTitles.includes(q)
+      );
+
+      return {
+        ...job.toObject(),
+        isQualified: matchedQualifications.length > 0,
+        matchedQualifications,
+        matchCount: matchedQualifications.length,
+      };
+    });
+
+    res.status(200).json(jobsWithMatchInfo);
+  } catch (error) {
+    console.error('Error fetching jobs with qualification match:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };

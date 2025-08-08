@@ -2,6 +2,8 @@ import { Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getBookmarks, deleteBookmark } from "../../services/bookmarkService";
 
+
+
 export default function BookMark() {
   const [bookmarks, setBookmarks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,16 +13,20 @@ export default function BookMark() {
     setLoading(true);
     try {
       const response = await getBookmarks();
-      // Accept either an array directly or an object with bookmarks array inside
-      const data = Array.isArray(response.data) ? response.data : response.data.bookmarks;
-      setBookmarks(data || []);
-    } catch {
+
+      console.log("Full response (bookmarks array):", response);
+
+      // Since response is already the array, just assign it:
+      let data = Array.isArray(response) ? response : [];
+
+      setBookmarks(data);
+    } catch (err) {
+      console.error("Error fetching bookmarks:", err);
       setError("Failed to load bookmarks.");
     } finally {
       setLoading(false);
     }
   };
-
 
   const handleDelete = async (id) => {
     try {
@@ -51,38 +57,34 @@ export default function BookMark() {
       {bookmarks.length === 0 ? (
         <p className="text-gray-500 text-center">No bookmarks found.</p>
       ) : (
-        <div className="space-y-4">
-          {bookmarks.map((b) => (
-            <div
-              key={b._id}
-              className="p-4 border rounded shadow-sm flex justify-between items-center"
-            >
-              <div>
-                <h2 className="font-semibold text-lg">
-                  {b.itemType === "job"
-                    ? b.itemId?.title || "Untitled Job"
-                    : b.itemType === "application"
-                      ? b.itemId?.job?.title || "Untitled Application"
-                      : "Untitled"}
-                </h2>
-                <p className="text-gray-500">
-                  {b.itemType === "job"
-                    ? "Bookmarked Job"
-                    : b.itemType === "application"
-                      ? "Bookmarked Application"
-                      : ""}
-                </p>
-              </div>
-              <button
-                onClick={() => handleDelete(b._id)}
-                className="text-red-500 hover:text-red-700"
-                aria-label="Delete bookmark"
-                title="Delete bookmark"
+        <div className="flex flex-wrap gap-6 justify-center">
+          {bookmarks.map((b) => {
+            const title = b.itemId?.title || "Untitled";
+            const type = b.itemId?.type || "N/A";
+            const date = new Date(b.createdAt).toLocaleDateString();
+
+            return (
+              <div
+                key={b._id}
+                className="flex flex-col justify-between p-4 border rounded-lg shadow-md w-full sm:w-80 md:w-72 lg:w-64 bg-white dark:bg-gray-800 hover:shadow-lg transition-shadow duration-300"
               >
-                <Trash size={20} />
-              </button>
-            </div>
-          ))}
+                <div className="mb-4">
+                  <h2 className="font-semibold text-xl text-white">{title}</h2>
+                  <p className="text-green-200">Type: {type}</p>
+                  <p className="text-sm text-gray-400">Bookmarked on: {date}</p>
+                </div>
+
+                <button
+                  onClick={() => handleDelete(b._id)}
+                  className="self-end text-red-500 hover:text-red-700 cursor-pointer"
+                  aria-label="Delete bookmark"
+                  title="Delete bookmark"
+                >
+                  <Trash size={24} />
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

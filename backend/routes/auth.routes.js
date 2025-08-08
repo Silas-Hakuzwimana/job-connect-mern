@@ -6,6 +6,7 @@ router.post('/register', authController.register);
 router.post('/login', authController.login);
 router.post('/logout', authController.logout);
 router.post('/verify-otp', authController.verifyOTP);
+router.get('/me', authController.getCurrentUser);
 
 //Password request routes
 

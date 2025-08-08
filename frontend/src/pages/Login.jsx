@@ -40,7 +40,8 @@ export default function Login() {
     try {
       const res = await authService.verifyOtp({ email, otp });
 
-      login(res); // save user in context/localStorage
+      login(res.user); // save user in context/localStorage
+      console.log(res.user);
       toast.success("Logged in successfully");
 
 

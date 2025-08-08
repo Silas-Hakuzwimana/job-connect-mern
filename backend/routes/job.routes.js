@@ -1,15 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const jobCtrl = require('../controllers/job.controller');
+const jobController = require('../controllers/job.controller');
 const { auth, restrictTo } = require('../middlewares/auth.middleware');
 
 // Public
-router.get('/', jobCtrl.getAllJobs);
-router.get('/:id', jobCtrl.getJobById);
+router.get('/', jobController.getAllJobs);
+router.get('/:id', jobController.getJobById);
+
+router.get('/matched', auth, jobController.getJobsWithQualificationMatch);
 
 // Protected for employers
-router.post('/', auth, restrictTo('employer'), jobCtrl.createJob);
-router.put('/:id', auth, restrictTo('employer'), jobCtrl.updateJob);
-router.delete('/:id', auth, restrictTo('employer'), jobCtrl.deleteJob);
+router.post('/', auth, restrictTo('employer'), jobController.createJob);
+router.put('/:id', auth, restrictTo('employer'), jobController.updateJob);
+router.delete('/:id', auth, restrictTo('employer'), jobController.deleteJob);
 
 module.exports = router;

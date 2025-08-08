@@ -29,7 +29,7 @@ import JobSeekerDashboard from "./pages/jobseeker/JobSeekerDashboard";
 import Applications from "./components/jobseeker/Applications";
 import Notifications from "./components/jobseeker/Notifications";
 import Profile from "./components/jobseeker/Profile";
-import Qualifications from "./components/jobseeker/Qualiifcations";
+import Qualifications from "./components/jobseeker/Qualifications";
 
 import CompanyDashboard from "./pages/company/CompanyDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -171,6 +171,7 @@ export default function App() {
           <Route path="settings" element={<Settings />} />
           <Route path="jobs/:id" element={<JobDetails />} />
           <Route path="qualifications" element={<Qualifications />} />
+          <Route path="notifications" element={<Notifications />} />
         </Route>
 
         {/* ✅ Company Dashboard (Simple) */}

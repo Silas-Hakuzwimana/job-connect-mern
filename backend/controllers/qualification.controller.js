@@ -7,7 +7,11 @@ exports.createQualification = async (req, res) => {
     const { title, description } = req.body;
 
     // Check for existing qualification title
-    const existing = await Qualification.findOne({ title: title.trim() });
+    const existing = await Qualification.findOne({
+      title: title.trim(),
+      createdBy: req.user.id,
+    });
+
     if (existing) {
       return res.status(400).json({ error: 'Qualification already exists' });
     }
@@ -19,7 +23,7 @@ exports.createQualification = async (req, res) => {
     const qualification = new Qualification({
       title: title || '',
       description: description || '',
-      owner: user.name, 
+      owner: user.name,
       createdBy: user._id,
     });
 
@@ -35,7 +39,6 @@ exports.createQualification = async (req, res) => {
   }
 };
 
-
 exports.saveUserQualifications = async (req, res) => {
   try {
     const { qualifications } = req.body; // array of titles or IDs
@@ -45,24 +48,25 @@ exports.saveUserQualifications = async (req, res) => {
     // Fetch existing qualifications
     const savedQuals = await Qualification.find({
       title: { $in: qualifications },
+      createdBy: user._id
     });
 
     // Determine which titles are new
-    const existingTitles = savedQuals.map(q => q.title);
-    const newTitles = qualifications.filter(t => !existingTitles.includes(t));
+    const existingTitles = savedQuals.map((q) => q.title);
+    const newTitles = qualifications.filter((t) => !existingTitles.includes(t));
 
     // Insert new qualifications with required fields
     const newQuals = await Qualification.insertMany(
-      newTitles.map(title => ({
+      newTitles.map((title) => ({
         title,
         createdBy: user._id,
         owner: user.name,
-      }))
+      })),
     );
 
     // Combine all qualifications
     const allQuals = [...savedQuals, ...newQuals];
-    user.qualifications = allQuals.map(q => q._id);
+    user.qualifications = allQuals.map((q) => q._id);
     await user.save();
 
     // Return updated user with populated qualifications

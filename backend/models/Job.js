@@ -1,5 +1,9 @@
 const mongoose = require('mongoose');
 
+function arrayLimit(val) {
+  return val.length > 0;
+}
+
 const jobSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
@@ -11,7 +15,10 @@ const jobSchema = new mongoose.Schema(
       enum: ['full-time', 'part-time', 'contract'],
       default: 'full-time',
     },
-    salary: { type: Number },
+    salary: {
+      min: { type: Number, required: true },
+      max: { type: Number, required: true },
+    },
     qualifications: {
       type: [String],
       required: true,
@@ -23,8 +30,6 @@ const jobSchema = new mongoose.Schema(
       required: true,
     },
     isActive: { type: Boolean, default: true },
-
-    // ✅ Add this field:
     status: {
       type: String,
       enum: ['approved', 'rejected', 'pending'],
@@ -34,14 +39,11 @@ const jobSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-// Custom validator for qualifications length
-function arrayLimit(val) {
-  return val.length > 0;
-}
-
-// Optional: Virtual field for flagging if qualifications are present
 jobSchema.virtual('hasRequiredQualifications').get(function () {
   return this.qualifications && this.qualifications.length > 0;
 });
+
+jobSchema.set('toJSON', { virtuals: true });
+jobSchema.set('toObject', { virtuals: true });
 
 module.exports = mongoose.model('Job', jobSchema);

@@ -1,26 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { AuthContext } from '../../context/AuthContext';
 import { fetchAllQualifications, saveUserQualifications } from '../../services/qualificationService';
 import { Check, Trash2, PlusCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 
-export default function Qualifications({ user, onUpdate }) {
-  // eslint-disable-next-line no-unused-vars
-  const [allQualifications, setAllQualifications] = useState([]);
+export default function Qualifications({ onUpdate }) {
+  const { user } = useContext(AuthContext);
+  const {refreshUser} = useContext(AuthContext);
+
+  const [, setAllQualifications] = useState([]);
   const [userQualifications, setUserQualifications] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log('User prop received in Qualifications:', user);
-    loadQualifications();
-    if (user?.qualifications) {
-      const titles = user.qualifications.map(q => (typeof q === 'object' ? q.title : q));
-      setUserQualifications(titles);
-    } else {
-      setUserQualifications([]);
-    }
+    if (!user) return;
 
+    loadQualifications();
+
+    const titles = user.qualifications?.map((q) =>
+      typeof q === 'object' ? q.title : q
+    ) || [];
+    setUserQualifications(titles);
   }, [user]);
 
   const loadQualifications = async () => {
@@ -34,23 +36,22 @@ export default function Qualifications({ user, onUpdate }) {
   };
 
   const handleAdd = () => {
-    const trimmed = (inputValue || '').trim(); // Ensure inputValue is a string
+    const trimmed = (inputValue || '').trim();
     if (!trimmed || userQualifications.includes(trimmed)) return;
     setUserQualifications([...userQualifications, trimmed]);
     setInputValue('');
   };
 
   const handleRemove = (title) => {
-    setUserQualifications(userQualifications.filter(q => q !== title));
+    setUserQualifications(userQualifications.filter((q) => q !== title));
   };
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-
-      console.log('Saving qualiifcations: ', userQualifications);
       const updatedUser = await saveUserQualifications(userQualifications);
-      onUpdate?.(updatedUser);
+      onUpdate?.(updatedUser); // optional callback
+      await refreshUser();
       toast.success('Qualifications saved successfully!');
     } catch (err) {
       console.error(err);
@@ -59,6 +60,10 @@ export default function Qualifications({ user, onUpdate }) {
       setIsSaving(false);
     }
   };
+
+  if (!user) {
+    return <div className="text-red-500">User not logged in.</div>;
+  }
 
   return (
     <div className="bg-white shadow rounded-xl p-6">
@@ -81,8 +86,9 @@ export default function Qualifications({ user, onUpdate }) {
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg ${isSaving ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'
-            } text-white`}
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg ${
+            isSaving ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'
+          } text-white`}
         >
           <Check className="w-4 h-4" />
           {isSaving ? 'Saving...' : 'Save'}

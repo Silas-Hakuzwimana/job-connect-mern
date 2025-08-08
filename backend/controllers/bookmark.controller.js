@@ -1,4 +1,7 @@
 const Bookmark = require('../models/Bookmark');
+const Job = require('../models/Job');
+const Application = require('../models/Application');
+
 
 // Add a bookmark (job or application)
 exports.addBookmark = async (req, res, next) => {
@@ -18,15 +21,32 @@ exports.addBookmark = async (req, res, next) => {
 };
 
 // Get all bookmarks for a user
+
 exports.getBookmarks = async (req, res, next) => {
   try {
     const userId = req.user._id;
-    const bookmarks = await Bookmark.find({ userId });
-    res.json(bookmarks);
+
+    // Fetch bookmarks for user
+    const bookmarks = await Bookmark.find({ userId }).lean();
+
+    // For each bookmark, populate itemId manually based on itemType
+    const populatedBookmarks = await Promise.all(bookmarks.map(async (bookmark) => {
+      if (bookmark.itemType === 'job') {
+        bookmark.itemId = await Job.findById(bookmark.itemId, 'title type').lean();
+      } else if (bookmark.itemType === 'application') {
+        bookmark.itemId = await Application.findById(bookmark.itemId, 'title type').lean();
+      } else {
+        bookmark.itemId = null; // or keep as is
+      }
+      return bookmark;
+    }));
+
+    res.json(populatedBookmarks);
   } catch (error) {
     next(error);
   }
 };
+
 
 // Remove a bookmark
 exports.removeBookmark = async (req, res, next) => {

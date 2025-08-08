@@ -113,6 +113,35 @@ exports.verifyOTP = async (req, res) => {
   }
 };
 
+exports.getCurrentUser = async (req, res) => {
+  try {
+    const token = req.cookies.token;
+
+    if (!token) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json({
+      user: {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        id: user._id,
+      },
+    });
+  } catch (err) {
+    console.error('Get current user error:', err);
+    res.status(401).json({ error: 'Invalid or expired token' });
+  }
+};
+
 // Request password reset - generates token and emails user
 exports.requestPasswordReset = async (req, res) => {
   const { email } = req.body;
