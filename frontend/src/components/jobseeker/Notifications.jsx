@@ -3,9 +3,9 @@ import React from 'react';
 export default function Notifications({ notifications = [] }) {
   return (
     <div className="p-4 bg-white shadow rounded-lg">
-      <h2 className="text-xl font-semibold mb-4">Notifications</h2>
+      <h2 className="text-xl font-semibold mb-4 text-center">Notifications</h2>
       {notifications.length === 0 ? (
-        <p className="text-gray-500">You have no notifications.</p>
+        <p className="text-gray-500 text-center">You have no notifications.</p>
       ) : (
         <ul className="space-y-3">
           {notifications.map((notification, index) => (

@@ -1,10 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const { uploadProfileImage } = require('../controllers/cloudinary.controller');
+const { uploadProfileImage, uploadResume } = require('../controllers/cloudinary.controller');
 
-const upload = multer(); // Use memory storage
+// Use memory storage
+const upload = multer(); 
 
 router.post('/profile-image', upload.single('image'), uploadProfileImage);
+
+// For cover letter or resume upload
+router.post('/application-files', upload.single('file'), uploadResume);
 
 module.exports = router;

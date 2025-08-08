@@ -9,6 +9,8 @@ router.get('/:id', jobController.getJobById);
 
 router.get('/matched', auth, jobController.getJobsWithQualificationMatch);
 
+router.get('/jobs', auth, jobController.getAllJobsWithQualificationStatus);
+
 // Protected for employers
 router.post('/', auth, restrictTo('employer'), jobController.createJob);
 router.put('/:id', auth, restrictTo('employer'), jobController.updateJob);

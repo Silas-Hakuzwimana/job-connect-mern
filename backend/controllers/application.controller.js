@@ -6,11 +6,7 @@ const logger = require('../services/logger.service'); // Optional logging
 // Apply to a job
 exports.applyToJob = async (req, res) => {
   const { jobId } = req.params;
-  const { qualifications, coverLetter } = req.body;
-
-  if (!req.file || !req.file.path) {
-    return res.status(400).json({ error: 'Resume file is required' });
-  }
+  const { qualifications, coverLetter, resumeUrl, coverLetterUrl } = req.body;
 
   try {
     const alreadyApplied = await Application.findOne({
@@ -19,25 +15,35 @@ exports.applyToJob = async (req, res) => {
     });
 
     if (alreadyApplied) {
-      return res.status(400).json({ error: 'You have already applied to this job.' });
+      return res
+        .status(400)
+        .json({ error: 'You have already applied to this job.' });
+    }
+
+    // qualifications might be a stringified JSON
+    let parsedQualifications = [];
+    if (qualifications) {
+      parsedQualifications =
+        typeof qualifications === 'string'
+          ? JSON.parse(qualifications)
+          : qualifications;
     }
 
     const application = await Application.create({
       applicant: req.user.id,
       job: jobId,
-      qualifications,
-      coverLetter,
-      resumeUrl: req.file.path, // Cloudinary URL
+      qualifications: parsedQualifications,
+      coverLetter, 
+      resumeUrl, 
+      coverLetterUrl,
     });
-
-    logger.info('New application submitted', { user: req.user.email, jobId });
 
     res.status(201).json({
       message: 'Application submitted successfully',
       application,
     });
   } catch (err) {
-    logger.error('Failed to apply', err);
+    console.error('Failed to apply', err);
     res.status(500).json({ error: 'Failed to apply', details: err.message });
   }
 };
@@ -50,8 +56,10 @@ exports.getApplications = async (req, res) => {
     if (req.user.role === 'jobseeker') {
       filter.applicant = req.user.id;
     } else if (req.user.role === 'employer') {
-      const employerJobs = await Job.find({ createdBy: req.user.id }).select('_id');
-      filter.job = { $in: employerJobs.map(job => job._id) };
+      const employerJobs = await Job.find({ createdBy: req.user.id }).select(
+        '_id',
+      );
+      filter.job = { $in: employerJobs.map((job) => job._id) };
     }
 
     const applications = await Application.find(filter)

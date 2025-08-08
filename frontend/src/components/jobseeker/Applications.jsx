@@ -3,9 +3,9 @@ import React from 'react';
 export default function Applications({ applications = [] }) {
   return (
     <div className="p-4 bg-white shadow rounded-lg">
-      <h2 className="text-xl font-semibold mb-4">Your Applications</h2>
+      <h2 className="text-xl font-semibold mb-4 text-center">Your Applications</h2>
       {applications.length === 0 ? (
-        <p className="text-gray-500">You have not applied for any jobs yet.</p>
+        <p className="text-gray-500 text-center">You have not applied for any jobs yet.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full table-auto border-collapse border border-gray-200">
