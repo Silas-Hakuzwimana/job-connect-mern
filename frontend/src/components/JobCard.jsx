@@ -56,8 +56,16 @@ export default function JobCard({ job, isQualified }) {
 
   return (
     <div className="border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-lg transition-shadow bg-white max-w-md mx-auto">
-      <h2 className="text-2xl font-semibold text-gray-900">{job.title}</h2>
-      <p className="text-gray-700 mt-3">{job.description}</p>
+
+      <h2 className="text-2xl font-semibold text-gray-900"><span className="bg-blue-800 border border-blue-300 text-white px-3 py-1 rounded shadow-sm">Job Title: </span>
+        <br>
+        </br>
+        {job.title}</h2>
+
+      <p className="text-gray-700 mt-3"><span className="font-semibold">Description: </span>
+        <br>
+        </br>
+        {job.description}</p>
 
       <p className="text-sm mt-4">
         <span className="font-semibold">Qualification(s): </span>

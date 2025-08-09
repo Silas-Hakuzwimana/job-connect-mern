@@ -1,4 +1,5 @@
 const Job = require('../models/Job');
+const User = require('../models/User');
 const Qualification = require('../models/Qualification');
 
 exports.createJob = async (req, res) => {
@@ -19,11 +20,24 @@ exports.createJob = async (req, res) => {
 };
 
 exports.getAllJobs = async (req, res) => {
-  const jobs = await Job.find({ isActive: true, status:"approved" }).populate(
+  const jobs = await Job.find({ isActive: true, status: 'approved' }).populate(
     'postedBy',
     'name email',
   );
   res.json(jobs);
+};
+
+/**
+ * Get all active & approved jobs
+ */
+exports.getActiveApprovedJobs = async (req, res) => {
+  try {
+    const jobs = await Job.find({ isActive: true, isApproved: true });
+    res.status(200).json(jobs);
+  } catch (error) {
+    console.error('Error fetching jobs:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
 exports.getJobById = async (req, res) => {
@@ -63,65 +77,54 @@ exports.deleteJob = async (req, res) => {
   }
 };
 
-exports.getJobsWithQualificationMatch = async (req, res) => {
+/**
+ * Get all active & approved jobs with qualification flag for logged-in user
+ */
+
+exports.flagJobsQualificationStatus = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
 
-    // 1. Get all qualifications owned by user
-    const userQualifications = await Qualification.find({ createdBy: userId });
-    const userQualTitles = userQualifications.map((q) => q.title);
+    // 1. Find user & populate qualifications
+    const user = await User.findById(userId).populate('qualifications');
 
-    // 2. Fetch jobs that are active and approved
-    const jobs = await Job.find({ isActive: true, status: 'approved' });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
-    // 3. Compare qualifications for each job
-    const jobsWithMatchInfo = jobs.map((job) => {
-      // job.qualifications is array of required qualification titles
-      const matchedQualifications = job.qualifications.filter((q) =>
-        userQualTitles.includes(q),
-      );
+    // 2. Extract user qualification titles as a Set for fast lookup
+    const userQualTitles = new Set(user.qualifications.map((q) => q.title));
 
-      return {
-        ...job.toObject(),
-        isQualified: matchedQualifications.length > 0,
-        matchedQualifications,
-        matchCount: matchedQualifications.length,
-      };
+    // 3. Get job IDs from request body
+    const { jobIds } = req.body;
+
+    if (!jobIds || !Array.isArray(jobIds)) {
+      return res.status(400).json({ message: 'jobIds must be an array' });
+    }
+
+    // 4. Fetch jobs by IDs, active & approved only
+    const jobs = await Job.find({
+      _id: { $in: jobIds },
+      isActive: true,
+      status: 'approved',
     });
 
-    res.status(200).json(jobsWithMatchInfo);
-  } catch (error) {
-    console.error('Error fetching jobs with qualification match:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-exports.getAllJobsWithQualificationStatus = async (req, res) => {
-  try {
-    const userId = req.user.id; // assuming authentication middleware sets req.user
-
-    const jobs = await Job.find().populate('qualifications'); // job.required qualifications
-    const user = await User.findById(userId).populate('qualifications'); // user qualifications
-
-    const userQualIds = user.qualifications.map((q) => q._id.toString());
-
-    const jobsWithStatus = jobs.map((job) => {
-      const requiredQualIds = job.qualifications.map((q) => q._id.toString());
-
-      // Check if all required qualifications exist in user qualifications
-      const isQualified = requiredQualIds.every((reqId) =>
-        userQualIds.includes(reqId),
-      );
-
-      return {
-        ...job.toObject(),
-        qualified: isQualified,
-      };
+    // 5. Build result object { jobId: true/false }
+    const flags = {};
+    jobs.forEach((job) => {
+      // Check if any job qualification matches user qualifications
+      const isQualified = job.qualifications.some((q) => userQualTitles.has(q));
+      flags[job._id.toString()] = isQualified;
     });
 
-    res.status(200).json(jobsWithStatus);
+    // For jobs not found (or inactive/ not approved), mark false
+    jobIds.forEach((id) => {
+      if (!(id in flags)) flags[id] = false;
+    });
+
+    return res.json(flags);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('Error in flagJobsQualificationStatus:', err);
+    return res.status(500).json({ message: 'Server error' });
   }
 };

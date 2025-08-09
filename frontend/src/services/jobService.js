@@ -10,9 +10,23 @@ export const fetchMatchedJobs = async () => {
   return res.data;
 };
 
-export const AddStatusToJob = async () => {
-  const res = await api.get('/jobs');
+// Fetch all active & approved jobs
+export const fetchActiveApprovedJobs = async () => {
+  const res = await api.get('/jobs/active-approved');
   return res.data;
+};
+
+// Fetch jobs with qualification flag for logged-in user
+// export const fetchJobsWithQualificationFlag = () => {
+//   return api.get('/jobs/flag-qualification');
+// };
+
+// New: send job IDs to backend, get qualification flags
+export const fetchQualificationFlags = async (jobIds) => {
+  if (!jobIds.length) return {};
+
+  const res = await api.post('/jobs/flag-qualification', { jobIds });
+  return res.data; // object { jobId1: true, jobId2: false, ... }
 };
 
 export const postJob = async (jobData) => {
