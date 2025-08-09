@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { fetchNotifications, markNotificationAsRead, getNotificationsCount, hideNotification, unhideNotification } from '../../services/notificationService';
+import { fetchUnhiddenNotifications, markNotificationAsRead, getNotificationsCount, hideNotification, unhideNotification } from '../../services/notificationService';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -20,7 +20,7 @@ export default function Notifications() {
 
   const loadNotifications = async () => {
     try {
-      const data = await fetchNotifications();
+      const data = await fetchUnhiddenNotifications();
       setNotifications(Array.isArray(data.notifications) ? data.notifications : []);
     } catch {
       toast.error('Failed to load notifications.');
