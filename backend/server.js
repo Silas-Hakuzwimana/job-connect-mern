@@ -24,6 +24,7 @@ const bookmarkRoutes = require('./routes/bookmark.routes.js');
 const jobSeekerRoutes = require('./routes/jobseeker.routes.js');
 const companyRoutes = require('./routes/company.routes.js');
 const uploadRoutes = require('./routes/cloudinary.routes.js');
+const notificationRoutes = require('./routes/notification.routes.js');
 
 // Swagger Documentation
 const swaggerDocument = YAML.load('./docs/swagger.yaml');
@@ -73,6 +74,7 @@ app.use('/api/bookmarks', bookmarkRoutes);
 app.use('/api/jobseeker', jobSeekerRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // API Docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));

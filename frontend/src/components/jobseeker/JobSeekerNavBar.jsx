@@ -161,6 +161,7 @@ export default function JobSeekerNavbar({ notificationsCount = 0 }) {
             { name: "Bookmarks", to: "/jobseeker/dashboard/bookmarks" },
             { name: "Applications", to: "/jobseeker/dashboard/applications" },
             { name: "Qualifications", to: "/jobseeker/dashboard/qualifications" },
+            { name: "Notifications", to: "/jobseeker/dashboard/notifications" },
             { name: "Profile & Resume", to: "/jobseeker/dashboard/profile" },
             { name: "Settings", to: "/jobseeker/dashboard/settings" },
             { name: "Logout", to: "/logout", isDanger: true },

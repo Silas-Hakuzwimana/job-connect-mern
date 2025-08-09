@@ -5,6 +5,7 @@ import {
   fetchUserQualifications,
   saveUserQualifications,
 } from "../../services/qualificationService";
+import { createNotification } from "../../services/notificationService";
 import { Check, Trash2, PlusCircle } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -73,10 +74,26 @@ export default function Qualifications({ onUpdate }) {
       toast.success("Qualifications saved successfully!");
       onUpdate?.(updatedUser);
       await refreshUser();
+
+      await createNotification(
+        user.id,
+        "Your qualifications were saved successfully."
+      )
     } catch (err) {
       console.error("Failed to save qualifications:", err);
       setError("Failed to save qualifications.");
       toast.error("Failed to save qualifications.");
+
+      // Notify failure
+      try {
+        await createNotification(
+          user.id,
+          "Failed to save your qualifications. Please try again."
+        );
+      } catch (notifyErr) {
+        console.error("Failed to create notification", notifyErr);
+      }
+
     } finally {
       setIsSaving(false);
     }
@@ -128,9 +145,8 @@ export default function Qualifications({ onUpdate }) {
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg ${
-            isSaving ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"
-          } text-white`}
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg ${isSaving ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"
+            } text-white`}
           type="button"
         >
           <Check className="w-4 h-4" />
