@@ -92,3 +92,41 @@ exports.createNotification = async (
     console.error('Failed to create notification:', err);
   }
 };
+
+
+// Hide notification for user
+exports.hideNotification = async (req, res) => {
+  const notificationId = req.params.id;
+  const userId = req.user.id;
+
+  try {
+    await Notification.findByIdAndUpdate(notificationId, { $addToSet: { hiddenBy: userId } });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ message: 'Error hiding notification' });
+  }
+};
+
+// Unhide notification
+exports.unhideNotification = async (req, res) => {
+  const notificationId = req.params.id;
+  const userId = req.user.id;
+
+  try {
+    await Notification.findByIdAndUpdate(notificationId, { $pull: { hiddenBy: userId } });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ message: 'Error unhiding notification' });
+  }
+};
+
+// Fetch notifications excluding hidden ones
+exports.fetchUnhiddenNotifications = async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const notifications = await Notification.find({ hiddenBy: { $ne: userId } }).sort({ createdAt: -1 });
+    res.json({ notifications });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching notifications' });
+  }
+};

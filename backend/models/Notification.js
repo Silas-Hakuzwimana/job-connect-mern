@@ -10,7 +10,8 @@ const notificationSchema = new mongoose.Schema({
   },
   link: { type: String }, // optional URL to action/page
   isRead: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now }
+  hiddenBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  createdAt: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model('Notification', notificationSchema);

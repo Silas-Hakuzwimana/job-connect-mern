@@ -14,7 +14,7 @@ export const createNotification = async (userId, message) => {
 };
 
 export const fetchNotifications = async () => {
-  const response = await api.get('/notifications');
+  const response = await api.get(`/notifications?ts=${Date.now()}`);
   return response.data;
 };
 
@@ -23,7 +23,24 @@ export const markNotificationAsRead = async (notificationId) => {
   return response.data;
 };
 
-export async function getNotificationsCount() {
-  const response = await api.get('/notifications/unread-count');
-  return response.data.count || 0;
-}
+export const getNotificationsCount = async () => {
+  const response = await api.get(
+    `/notifications/unread-count?ts=${Date.now()}`,
+  );
+  return response.data.count;
+};
+
+export const hideNotification = async (id) => {
+  const res = await api.post(`/notifications/${id}/hide`);
+  return res.data;
+};
+
+export const unhideNotification = async (id) => {
+  const res = await api.post(`/notifications/${id}/unhide`);
+  return res.data;
+};
+
+export const fetchUnhiddenNotifications = async () => {
+  const res = await api.get('/notifications/get-unhidden-notifications');
+  return res.data;
+};

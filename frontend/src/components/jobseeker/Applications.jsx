@@ -1,6 +1,31 @@
-import React from 'react';
+import React, { useState} from "react";
+import { toast } from "react-toastify";
+import { addBookmark, deleteBookmark } from "../../services/bookmarkService";
 
-export default function Applications({ applications = [], loading, error }) {
+export default function Applications({ applications = [], loading, error, initialBookmarked = [] }) {
+  const [bookmarkedApps, setBookmarkedApps] = useState(initialBookmarked);
+
+  async function toggleBookmark(appId) {
+    if (bookmarkedApps.includes(appId)) {
+      // Remove bookmark
+      try {
+        await deleteBookmark(appId, "application");
+        setBookmarkedApps((prev) => prev.filter((id) => id !== appId));
+        toast.success("Bookmark removed");
+      } catch {
+        toast.error("Failed to remove bookmark");
+      }
+    } else {
+      // Add bookmark
+      try {
+        await addBookmark({ itemId: appId, itemType: "application" });
+        setBookmarkedApps((prev) => [...prev, appId]);
+        toast.success("Bookmarked successfully!");
+      } catch{
+        toast.error("Failed to add bookmark");
+      }
+    }
+  }
 
   if (loading) return <p className="text-center p-4">Loading your applications...</p>;
   if (error) return <p className="text-center p-4 text-red-600">{error}</p>;
@@ -22,6 +47,7 @@ export default function Applications({ applications = [], loading, error }) {
                 <th className="border border-gray-200 px-4 py-2 text-left">Type</th>
                 <th className="border border-gray-200 px-4 py-2 text-left">Status</th>
                 <th className="border border-gray-200 px-4 py-2 text-left">Applied At</th>
+                <th className="border border-gray-200 px-4 py-2 text-left">Bookmark</th>
               </tr>
             </thead>
             <tbody>
@@ -34,18 +60,30 @@ export default function Applications({ applications = [], loading, error }) {
                   <td className="border border-gray-200 px-4 py-2">{app.jobType}</td>
                   <td className="border border-gray-200 px-4 py-2">
                     <span
-                      className={`inline-block px-2 py-1 text-xs rounded-full ${app.status === 'pending'
-                        ? 'bg-yellow-100 text-yellow-700'
-                        : app.status === 'accepted'
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-red-100 text-red-700'
-                        }`}
+                      className={`inline-block px-2 py-1 text-xs rounded-full ${
+                        app.status === "pending"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : app.status === "accepted"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
+                      }`}
                     >
                       {app.status}
                     </span>
                   </td>
                   <td className="border border-gray-200 px-4 py-2">
                     {new Date(app.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="border border-gray-200 px-4 py-2 text-center">
+                    <button
+                      onClick={() => toggleBookmark(app._id)}
+                      className={`text-xl ${
+                        bookmarkedApps.includes(app._id) ? "text-blue-600" : "text-gray-400"
+                      }`}
+                      aria-label="Bookmark application"
+                    >
+                      {bookmarkedApps.includes(app._id) ? "★" : "☆"}
+                    </button>
                   </td>
                 </tr>
               ))}

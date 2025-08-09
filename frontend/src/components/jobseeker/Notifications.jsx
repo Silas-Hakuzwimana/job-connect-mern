@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { fetchNotifications, markNotificationAsRead, getNotificationsCount } from '../../services/notificationService';
+import { fetchNotifications, markNotificationAsRead, getNotificationsCount, hideNotification, unhideNotification } from '../../services/notificationService';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -8,6 +8,13 @@ export default function Notifications() {
   const [notificationsCount, setNotificationsCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Track which notifications are expanded (store IDs)
+  const [expandedIds, setExpandedIds] = useState(new Set());
+
+  // Track hidden notification IDs
+  const [hiddenIds, setHiddenIds] = useState(new Set());
+  const [processingHideIds, setProcessingHideIds] = useState(new Set()); // to disable
 
   const pollingInterval = useRef(null);
 
@@ -40,12 +47,10 @@ export default function Notifications() {
 
     fetchAll();
 
-    // Set up polling every 30 seconds (adjust as needed)
     pollingInterval.current = setInterval(() => {
       fetchAll();
     }, 30000);
 
-    // Cleanup on unmount
     return () => clearInterval(pollingInterval.current);
   }, []);
 
@@ -57,7 +62,6 @@ export default function Notifications() {
           notif._id === id ? { ...notif, isRead: true } : notif
         )
       );
-      // Decrease count locally to reflect change instantly
       setNotificationsCount((count) => Math.max(count - 1, 0));
     } catch {
       toast.error('Failed to mark as read.');
@@ -65,20 +69,67 @@ export default function Notifications() {
     }
   };
 
+  const toggleExpand = (id) => {
+    setExpandedIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) newSet.delete(id);
+      else newSet.add(id);
+      return newSet;
+    });
+  };
+
+  const toggleHide = async (id) => {
+    if (processingHideIds.has(id)) return; // prevent double clicks
+    const currentlyHidden = hiddenIds.has(id);
+
+    setProcessingHideIds((prev) => new Set(prev).add(id));
+
+    try {
+      if (currentlyHidden) {
+        await unhideNotification(id);
+        setHiddenIds((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(id);
+          return newSet;
+        });
+        await loadNotifications(); // reload fresh list after unhide
+      } else {
+        await hideNotification(id);
+        setHiddenIds((prev) => new Set(prev).add(id));
+        setNotifications((prev) => prev.filter((n) => n._id !== id));
+        setNotificationsCount((count) =>
+          Math.max(count - (notifications.find((n) => n._id === id)?.isRead ? 0 : 1), 0)
+        );
+      }
+    } catch (err) {
+      toast.error('Failed to update notification visibility.');
+      console.error('Toggle hide/unhide error', err);
+    } finally {
+      setProcessingHideIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(id);
+        return newSet;
+      });
+    }
+  };
+
   if (loading) return <p className="text-center p-4">Loading notifications...</p>;
   if (error) return <p className="text-center p-4 text-red-600">{error}</p>;
 
+  // Filter out hidden notifications before displaying
+  const visibleNotifications = notifications.filter(n => !hiddenIds.has(n._id));
+
   return (
-    <div className="p-4 bg-white shadow rounded-lg max-w-md mx-auto">
-      <h2 className="text-xl font-semibold mb-4 text-center">
+    <div className="p-4 max-w-6xl mx-auto">
+      <h2 className="text-xl font-semibold mb-6 text-center">
         Notifications {notificationsCount > 0 && `(${notificationsCount})`}
       </h2>
 
-      {notifications.length === 0 ? (
+      {visibleNotifications.length === 0 ? (
         <p className="text-gray-500 text-center">You have no notifications.</p>
       ) : (
-        <ul className="space-y-3">
-          {notifications.map(({ _id, message, createdAt, isRead, type, link }) => {
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {visibleNotifications.map(({ _id, message, createdAt, isRead, type, link }) => {
             const bgColorClass = {
               success: 'bg-green-50 border-green-300 text-green-800',
               error: 'bg-red-50 border-red-300 text-red-800',
@@ -86,42 +137,64 @@ export default function Notifications() {
               info: 'bg-blue-50 border-blue-300 text-blue-800',
             };
 
+            const isExpanded = expandedIds.has(_id);
+
             return (
-              <li
+              <div
                 key={_id}
-                className={`p-3 border rounded-md hover:bg-gray-100 transition flex justify-between items-start ${bgColorClass[type] || 'bg-gray-50 border-gray-200 text-gray-700'
-                  }`}
+                className={`border rounded-lg p-4 shadow-sm flex flex-col justify-between transition hover:shadow-md
+                  ${bgColorClass[type] || 'bg-gray-50 border-gray-200 text-gray-700'}
+                  ${!isRead ? 'font-semibold' : 'opacity-80'}
+                `}
               >
                 <div>
-                  <p className={`text-sm ${isRead ? 'opacity-70' : 'font-semibold'}`}>{message}</p>
-                  <span className="text-xs text-gray-400 block mt-1">
-                    {new Date(createdAt).toLocaleString()}
-                  </span>
-                  {link && (
-                    <a
-                      href={link}
-                      className="text-blue-600 hover:underline text-sm mt-1 block"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      View Details
-                    </a>
+                  <p className="mb-2 cursor-pointer" onClick={() => toggleExpand(_id)}>
+                    {isExpanded ? message : (message.length > 80 ? message.slice(0, 80) + '...' : message)}
+                  </p>
+                  {isExpanded && (
+                    <>
+                      <span className="text-xs text-gray-400 block mb-3">
+                        {new Date(createdAt).toLocaleString()}
+                      </span>
+                      {link && (
+                        <a
+                          href={link}
+                          className="text-blue-600 hover:underline text-sm"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          View Details
+                        </a>
+                      )}
+                    </>
                   )}
                 </div>
 
-                {!isRead && (
+                <div className="mt-4 flex justify-between items-center">
+                  {!isRead ? (
+                    <button
+                      onClick={() => handleMarkRead(_id)}
+                      className="text-sm text-blue-600 hover:underline"
+                      aria-label="Mark notification as read"
+                    >
+                      Mark as read
+                    </button>
+                  ) : (
+                    <span className="text-sm text-gray-500">Read</span>
+                  )}
+
                   <button
-                    onClick={() => handleMarkRead(_id)}
-                    className="ml-3 text-sm text-blue-600 hover:underline"
-                    aria-label="Mark notification as read"
+                    onClick={() => toggleHide(_id)}
+                    className="text-sm text-red-600 hover:underline"
+                    aria-label={hiddenIds.has(_id) ? "Unhide notification" : "Hide notification"}
                   >
-                    Mark as read
+                    {hiddenIds.has(_id) ? "Unhide" : "Hide"}
                   </button>
-                )}
-              </li>
+                </div>
+              </div>
             );
           })}
-        </ul>
+        </div>
       )}
     </div>
   );
