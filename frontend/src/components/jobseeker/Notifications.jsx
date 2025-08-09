@@ -138,6 +138,8 @@ export default function Notifications() {
             };
 
             const isExpanded = expandedIds.has(_id);
+            const isHidden = hiddenIds.has(_id);
+            const isProcessing = processingHideIds.has(_id);
 
             return (
               <div
@@ -185,10 +187,12 @@ export default function Notifications() {
 
                   <button
                     onClick={() => toggleHide(_id)}
-                    className="text-sm text-red-600 hover:underline"
-                    aria-label={hiddenIds.has(_id) ? "Unhide notification" : "Hide notification"}
+                    className="text-sm hover:underline"
+                    aria-label={isHidden ? 'Unhide notification' : 'Hide notification'}
+                    disabled={isProcessing}
+                    style={{ color: isHidden ? '#16a34a' : '#dc2626' }} // green if unhide, red if hide
                   >
-                    {hiddenIds.has(_id) ? "Unhide" : "Hide"}
+                    {isHidden ? 'Unhide' : 'Hide'}
                   </button>
                 </div>
               </div>
