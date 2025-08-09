@@ -43,7 +43,7 @@ export default function Notifications() {
     // Set up polling every 30 seconds (adjust as needed)
     pollingInterval.current = setInterval(() => {
       fetchAll();
-    }, 1000);
+    }, 30000);
 
     // Cleanup on unmount
     return () => clearInterval(pollingInterval.current);

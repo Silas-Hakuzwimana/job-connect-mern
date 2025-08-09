@@ -111,6 +111,12 @@ export default function JobCard({ job, isQualified }) {
         {job.salary ? `${job.salary} USD` : 'Not specified'}
       </p>
 
+      <p className="text-sm mt-1 text-gray-700">
+        <span className="font-semibold">Type: </span>
+        {job.salary ? `${job.type}` : 'Not specified'}
+      </p>
+
+
       <p className="mt-3">
         {isQualified ? (
           <span className="text-green-600 font-semibold inline-flex items-center gap-1">

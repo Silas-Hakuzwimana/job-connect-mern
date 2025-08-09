@@ -10,7 +10,7 @@ import { Check, Trash2, PlusCircle } from "lucide-react";
 import { toast } from "react-toastify";
 
 export default function Qualifications({ onUpdate }) {
-  const { user, refreshUser } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const [allQualifications, setAllQualifications] = useState([]);
   const [userQualifications, setUserQualifications] = useState([]);
   const [inputValue, setInputValue] = useState("");
@@ -75,7 +75,7 @@ export default function Qualifications({ onUpdate }) {
       onUpdate?.(updatedUser);
 
       try {
-        await refreshUser(); 
+        //await refreshUser(); 
       } catch (refreshErr) {
         console.warn("refreshUser failed, ignoring for now", refreshErr);
         // Do not clear user or redirect here!

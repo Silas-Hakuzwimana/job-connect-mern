@@ -1,11 +1,7 @@
 const User = require('../models/User.js');
 const Application = require('../models/Application.js');
-const Qualification = require('../models/Qualification');
 const Bookmark = require('../models/Bookmark.js');
-const cloudinary = require('../config/cloudinary');
 const bcrypt = require('bcryptjs');
-const streamifier = require('streamifier');
-const { profile } = require('winston');
 
 exports.jobseekerProfile = async (req, res) => {
   try {
@@ -27,24 +23,35 @@ exports.getJobseekerDashboard = async (req, res, next) => {
     const totalApplications = await Application.countDocuments({
       applicant: userId,
     });
-    const totalBookmarks = await Bookmark.countDocuments({ user: userId });
+
+    const totalBookmarks = await Bookmark.countDocuments({
+      userId: userId,
+    });
 
     const recentApplications = await Application.find({ applicant: userId })
       .populate('job', 'title company location')
       .sort({ createdAt: -1 })
       .limit(5);
 
-    const recentBookmarks = await Bookmark.find({ user: userId })
-      .populate('job', 'title company location')
+    const recentBookmarks = await Bookmark.find({
+      userId: userId,
+      itemType: 'job',
+    })
+      .populate('itemId') // Populates all fields from the Job model
       .sort({ createdAt: -1 })
-      .limit(5);
+      .limit(5)
+      .exec();
 
     res.json({
       user,
       stats: { totalApplications, totalBookmarks },
       recentApplications,
-      recentBookmarks,
+      bookmarks: recentBookmarks,
     });
+
+    console.log('Total bookmarks count:', totalBookmarks);
+    console.log('Total applications count:', totalApplications);
+
   } catch (error) {
     next(error);
   }

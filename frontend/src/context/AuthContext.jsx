@@ -1,5 +1,5 @@
 import React, { useState, useEffect, createContext } from "react";
-import getCurrentUser from "../services/authService";
+import { getCurrentUser } from "../services/authService";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext(null);
@@ -10,25 +10,29 @@ export function AuthProvider({ children }) {
 
   // Move fetchUser outside useEffect so you can call it anywhere inside AuthProvider
   const fetchUser = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+
     try {
-      const userData = await getCurrentUser(); // uses cookie session
-      if (!userData) {
-        // Don't clear user immediately, just log and keep old user?
-        console.warn("No user data returned but not clearing user state yet.");
-        return;
-      }
+      const userData = await getCurrentUser();
       setUser(userData);
     } catch (error) {
-      setUser(null); // user not logged in or session expired
-      console.error("Failed to fetch user:", error);
+      console.error('Failed to fetch user:', error);
+      setUser(null);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchUser(); // ✅ initial fetch
-  }, []);
+    if (!user) {
+      fetchUser(); // ✅ initial fetch
+    }
+  }, [user]);
 
   const login = async (userData) => {
     setUser(userData);
@@ -38,8 +42,9 @@ export function AuthProvider({ children }) {
   };
 
 
-  const refreshUser = async () => {
+  const refreshUser = async (force = false) => {
     try {
+      if (user && force) return user;
       const userData = await getCurrentUser();
       setUser(userData);
       return userData;

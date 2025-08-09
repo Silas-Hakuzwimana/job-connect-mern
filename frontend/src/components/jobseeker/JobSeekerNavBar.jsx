@@ -3,13 +3,12 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Briefcase, User } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
 import { toast } from "react-toastify";
-import { getNotificationsCount } from '../../services/notificationService';
-
+import { getNotificationsCount } from "../../services/notificationService";
 
 export default function JobSeekerNavbar() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const { user } = useContext(AuthContext);
-  const { logout } = useContext(AuthContext);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const { user, logout } = useContext(AuthContext);
   const [notificationsCount, setNotificationsCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,8 +32,8 @@ export default function JobSeekerNavbar() {
     try {
       const count = await getNotificationsCount();
       setNotificationsCount(count);
-    } catch{
-      toast.error('Failed to fetch notifications count.');
+    } catch {
+      toast.error("Failed to fetch notifications count.");
       setError("Failed to fetch notifications count");
     }
   };
@@ -45,15 +44,9 @@ export default function JobSeekerNavbar() {
       await Promise.all([loadCount()]);
       setLoading(false);
     }
-
     fetchAll();
 
-    // Set up polling every 30 seconds (adjust as needed)
-    pollingInterval.current = setInterval(() => {
-      fetchAll();
-    }, 1000);
-
-    // Cleanup on unmount
+    pollingInterval.current = setInterval(fetchAll, 30000);
     return () => clearInterval(pollingInterval.current);
   }, []);
 
@@ -62,26 +55,29 @@ export default function JobSeekerNavbar() {
   if (loading) return <p className="text-center p-4">Loading notifications...</p>;
   if (error) return <p className="text-center p-4 text-red-600">{error}</p>;
 
+  const navLinks = [
+    { name: "Dashboard", to: "/jobseeker/dashboard" },
+    { name: "Browse Jobs", to: "/jobseeker/dashboard/jobs" },
+    { name: "Bookmarks", to: "/jobseeker/dashboard/bookmarks" },
+    { name: "Applications", to: "/jobseeker/dashboard/applications" },
+    { name: "Qualifications", to: "/jobseeker/dashboard/qualifications" },
+    { name: "Notifications", to: "/jobseeker/dashboard/notifications" },
+  ];
+
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          {/* Brand & Navigation */}
+          {/* Brand */}
           <div className="flex items-center space-x-8">
             <Link to="../dashboard" className="flex items-center text-2xl font-bold text-indigo-600">
               <Briefcase className="h-5 w-5 mr-1" />
               JobConnect
             </Link>
 
+            {/* Desktop Nav */}
             <div className="hidden sm:flex space-x-6">
-              {[
-                { name: "Dashboard", to: "/jobseeker/dashboard" },
-                { name: "Browse Jobs", to: "/jobseeker/dashboard/jobs" },
-                { name: "Bookmarks", to: "/jobseeker/dashboard/bookmarks" },
-                { name: "Applications", to: "/jobseeker/dashboard/applications" },
-                { name: "Qualifications", to: "/jobseeker/dashboard/qualifications" },
-                { name: "Notifications", to: "/jobseeker/dashboard/notifications" },
-              ].map(({ name, to }) => (
+              {navLinks.map(({ name, to }) => (
                 <NavLink
                   key={to}
                   to={to}
@@ -98,7 +94,7 @@ export default function JobSeekerNavbar() {
             </div>
           </div>
 
-          {/* Search + Notification + Profile */}
+          {/* Actions */}
           <div className="flex items-center space-x-4">
             {/* Notifications */}
             <Link to="/jobseeker/dashboard/notifications" className="relative text-gray-600 hover:text-gray-800">
@@ -119,10 +115,10 @@ export default function JobSeekerNavbar() {
               )}
             </Link>
 
-            {/* User dropdown */}
+            {/* Profile */}
             <div className="relative">
               <button
-                onClick={() => setMenuOpen(!menuOpen)}
+                onClick={() => setProfileOpen((prev) => !prev)}
                 className="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 {profileImg ? (
@@ -136,21 +132,13 @@ export default function JobSeekerNavbar() {
                     <User className="h-5 w-5 text-gray-500" />
                   </div>
                 )}
-
                 <span className="hidden sm:block text-sm font-medium text-gray-700">
                   {user?.name || "User"}
                 </span>
-                <svg className="h-4 w-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                  <path
-                    fillRule="evenodd"
-                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 111.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0l-4.25-4.65a.75.75 0 01.02-1.06z"
-                    clipRule="evenodd"
-                  />
-                </svg>
               </button>
 
               {/* Dropdown */}
-              {menuOpen && (
+              {profileOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md ring-1 ring-black ring-opacity-5 z-50">
                   <Link to="/jobseeker/dashboard/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-100">
                     Profile & Resume
@@ -165,54 +153,65 @@ export default function JobSeekerNavbar() {
                   >
                     Logout
                   </button>
-
                 </div>
               )}
             </div>
-          </div>
 
-          {/* Mobile menu button */}
-          <div className="sm:hidden">
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="p-2 rounded-md text-gray-600 hover:bg-gray-100"
-            >
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                {menuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
+            {/* Mobile menu button */}
+            <div className="sm:hidden">
+              <button
+                onClick={() => setMobileOpen((prev) => !prev)}
+                className="p-2 rounded-md text-gray-600 hover:bg-gray-100"
+              >
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {mobileOpen ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  )}
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Mobile Dropdown */}
-      {menuOpen && (
+      {/* Mobile Nav */}
+      {mobileOpen && (
         <div className="sm:hidden px-4 pb-4">
-          {[
-            { name: "Dashboard", to: "/jobseeker/dashboard" },
-            { name: "Browse Jobs", to: "/jobseeker/dashboard/jobs" },
-            { name: "Bookmarks", to: "/jobseeker/dashboard/bookmarks" },
-            { name: "Applications", to: "/jobseeker/dashboard/applications" },
-            { name: "Qualifications", to: "/jobseeker/dashboard/qualifications" },
-            { name: "Notifications", to: "/jobseeker/dashboard/notifications" },
-            { name: "Profile & Resume", to: "/jobseeker/dashboard/profile" },
-            { name: "Settings", to: "/jobseeker/dashboard/settings" },
-            { name: "Logout", to: "/logout", isDanger: true },
-          ].map(({ name, to, isDanger }) => (
+          {navLinks.map(({ name, to }) => (
             <NavLink
               key={to}
               to={to}
-              className={`block py-2 border-b text-sm ${isDanger ? "text-red-600 hover:bg-red-100" : "text-gray-700 hover:bg-gray-50"
-                }`}
-              onClick={() => setMenuOpen(false)}
+              className="block py-2 border-b text-sm text-gray-700 hover:bg-gray-50"
+              onClick={() => setMobileOpen(false)}
             >
               {name}
             </NavLink>
           ))}
+          <Link
+            to="/jobseeker/dashboard/profile"
+            className="block py-2 border-b text-sm text-gray-700 hover:bg-gray-50"
+            onClick={() => setMobileOpen(false)}
+          >
+            Profile & Resume
+          </Link>
+          <Link
+            to="/jobseeker/dashboard/settings"
+            className="block py-2 border-b text-sm text-gray-700 hover:bg-gray-50"
+            onClick={() => setMobileOpen(false)}
+          >
+            Settings
+          </Link>
+          <button
+            onClick={() => {
+              setMobileOpen(false);
+              handleLogout();
+            }}
+            className="block py-2 border-b text-sm text-red-600 hover:bg-red-100 w-full text-left"
+          >
+            Logout
+          </button>
         </div>
       )}
     </nav>
