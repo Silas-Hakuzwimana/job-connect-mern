@@ -12,9 +12,15 @@ export function AuthProvider({ children }) {
   const fetchUser = async () => {
     try {
       const userData = await getCurrentUser(); // uses cookie session
+      if (!userData) {
+        // Don't clear user immediately, just log and keep old user?
+        console.warn("No user data returned but not clearing user state yet.");
+        return;
+      }
       setUser(userData);
-    } catch {
+    } catch (error) {
       setUser(null); // user not logged in or session expired
+      console.error("Failed to fetch user:", error);
     } finally {
       setLoading(false);
     }
@@ -28,6 +34,20 @@ export function AuthProvider({ children }) {
     setUser(userData);
     if (userData.token) {
       localStorage.setItem('token', userData.token);
+    }
+  };
+
+
+  const refreshUser = async () => {
+    try {
+      const userData = await getCurrentUser();
+      setUser(userData);
+      return userData;
+    } catch {
+      setUser(null);
+      return null;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -48,7 +68,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, refreshUser: fetchUser }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

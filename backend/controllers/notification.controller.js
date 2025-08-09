@@ -34,6 +34,22 @@ exports.getUserNotifications = async (req, res) => {
   }
 };
 
+exports.getUnreadNotificationsCount = async (req, res) => {
+  try {
+    const userId = req.user._id; 
+
+    const count = await Notification.countDocuments({
+      user: userId,
+      isRead: false,
+    });
+
+    return res.json({ count });
+  } catch (error) {
+    console.error('Error getting unread notifications count:', error);
+    return res.status(500).json({ error: 'Server error' });
+  }
+}
+
 // Mark a notification as read
 exports.markAsRead = async (req, res) => {
   const { notificationId } = req.params;

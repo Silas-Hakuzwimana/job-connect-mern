@@ -73,18 +73,23 @@ export default function Qualifications({ onUpdate }) {
       const updatedUser = await saveUserQualifications(userQualifications);
       toast.success("Qualifications saved successfully!");
       onUpdate?.(updatedUser);
-      await refreshUser();
+
+      try {
+        await refreshUser(); 
+      } catch (refreshErr) {
+        console.warn("refreshUser failed, ignoring for now", refreshErr);
+        // Do not clear user or redirect here!
+      }
 
       await createNotification(
         user.id,
         "Your qualifications were saved successfully."
-      )
+      );
     } catch (err) {
       console.error("Failed to save qualifications:", err);
       setError("Failed to save qualifications.");
       toast.error("Failed to save qualifications.");
 
-      // Notify failure
       try {
         await createNotification(
           user.id,
@@ -93,7 +98,6 @@ export default function Qualifications({ onUpdate }) {
       } catch (notifyErr) {
         console.error("Failed to create notification", notifyErr);
       }
-
     } finally {
       setIsSaving(false);
     }

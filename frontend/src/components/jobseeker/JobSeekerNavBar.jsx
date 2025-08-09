@@ -1,15 +1,21 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useRef, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Briefcase, User } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
 import { toast } from "react-toastify";
+import { getNotificationsCount } from '../../services/notificationService';
 
 
-export default function JobSeekerNavbar({ notificationsCount = 0 }) {
+export default function JobSeekerNavbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { user } = useContext(AuthContext);
   const { logout } = useContext(AuthContext);
+  const [notificationsCount, setNotificationsCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+  const pollingInterval = useRef(null);
 
   const handleLogout = async () => {
     try {
@@ -23,7 +29,38 @@ export default function JobSeekerNavbar({ notificationsCount = 0 }) {
     }
   };
 
+  const loadCount = async () => {
+    try {
+      const count = await getNotificationsCount();
+      setNotificationsCount(count);
+    } catch{
+      toast.error('Failed to fetch notifications count.');
+      setError("Failed to fetch notifications count");
+    }
+  };
+
+  useEffect(() => {
+    async function fetchAll() {
+      setLoading(true);
+      await Promise.all([loadCount()]);
+      setLoading(false);
+    }
+
+    fetchAll();
+
+    // Set up polling every 30 seconds (adjust as needed)
+    pollingInterval.current = setInterval(() => {
+      fetchAll();
+    }, 1000);
+
+    // Cleanup on unmount
+    return () => clearInterval(pollingInterval.current);
+  }, []);
+
   const profileImg = user?.profilePicture || null;
+
+  if (loading) return <p className="text-center p-4">Loading notifications...</p>;
+  if (error) return <p className="text-center p-4 text-red-600">{error}</p>;
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">

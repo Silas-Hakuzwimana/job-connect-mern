@@ -1,25 +1,52 @@
-import React, { useEffect, useState } from 'react';
-import { fetchNotifications, markNotificationAsRead } from '../../services/notificationService';
+import React, { useEffect, useState, useRef } from 'react';
+import { fetchNotifications, markNotificationAsRead, getNotificationsCount } from '../../services/notificationService';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
+  const [notificationsCount, setNotificationsCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const pollingInterval = useRef(null);
+
   const loadNotifications = async () => {
     try {
-      setLoading(true);
       const data = await fetchNotifications();
       setNotifications(Array.isArray(data.notifications) ? data.notifications : []);
     } catch {
+      toast.error('Failed to load notifications.');
       setError('Failed to load notifications');
-    } finally {
-      setLoading(false);
+    }
+  };
+
+  const loadCount = async () => {
+    try {
+      const count = await getNotificationsCount();
+      setNotificationsCount(count);
+    } catch (err) {
+      toast.error('Failed to fetch notifications count.');
+      console.error("Failed to fetch notifications count", err);
     }
   };
 
   useEffect(() => {
-    loadNotifications();
+    async function fetchAll() {
+      setLoading(true);
+      await Promise.all([loadNotifications(), loadCount()]);
+      setLoading(false);
+    }
+
+    fetchAll();
+
+    // Set up polling every 30 seconds (adjust as needed)
+    pollingInterval.current = setInterval(() => {
+      fetchAll();
+    }, 1000);
+
+    // Cleanup on unmount
+    return () => clearInterval(pollingInterval.current);
   }, []);
 
   const handleMarkRead = async (id) => {
@@ -27,11 +54,14 @@ export default function Notifications() {
       await markNotificationAsRead(id);
       setNotifications((prev) =>
         prev.map((notif) =>
-          notif._id === id ? { ...notif, read: true } : notif
+          notif._id === id ? { ...notif, isRead: true } : notif
         )
       );
+      // Decrease count locally to reflect change instantly
+      setNotificationsCount((count) => Math.max(count - 1, 0));
     } catch {
-      alert('Failed to mark as read');
+      toast.error('Failed to mark as read.');
+      console.error('Failed to mark as read');
     }
   };
 
@@ -40,7 +70,9 @@ export default function Notifications() {
 
   return (
     <div className="p-4 bg-white shadow rounded-lg max-w-md mx-auto">
-      <h2 className="text-xl font-semibold mb-4 text-center">Notifications</h2>
+      <h2 className="text-xl font-semibold mb-4 text-center">
+        Notifications {notificationsCount > 0 && `(${notificationsCount})`}
+      </h2>
 
       {notifications.length === 0 ? (
         <p className="text-gray-500 text-center">You have no notifications.</p>
@@ -66,7 +98,12 @@ export default function Notifications() {
                     {new Date(createdAt).toLocaleString()}
                   </span>
                   {link && (
-                    <a href={link} className="text-blue-600 hover:underline text-sm mt-1 block" target="_blank" rel="noreferrer">
+                    <a
+                      href={link}
+                      className="text-blue-600 hover:underline text-sm mt-1 block"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
                       View Details
                     </a>
                   )}
