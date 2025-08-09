@@ -13,10 +13,10 @@ export default function ApplicationsPage() {
         setLoading(true);
         const data = await getUserApplications();
 
-        // Normalize API data for your component
+        // Normalize API data for component
         const formattedApps = data.map((app) => ({
           _id: app._id,
-          // Use embedded jobDetails instead of job
+          // Use embedded jobDetails 
           jobTitle: app.jobDetails?.title || "N/A",
           companyName: app.jobDetails?.company || "N/A",
           companyLocation: app.jobDetails?.location || "N/A",
@@ -24,11 +24,9 @@ export default function ApplicationsPage() {
           jobType: app.jobDetails?.type || "N/A",
           status: app.status,
           createdAt: app.appliedAt || app.createdAt,
-          // Optional: add more fields if needed, e.g.
-          location: app.jobDetails?.location || "N/A",
           coverLetter: app.coverLetter || "",
           resumeUrl: app.resumeUrl || "",
-          // Applicant details if you want to show them
+          // Applicant details 
           applicantName: app.applicantDetails?.name || "N/A",
           applicantEmail: app.applicantDetails?.email || "N/A",
         }));
