@@ -12,5 +12,7 @@ router.post(
 );
 
 router.get('/', auth, applicationController.getApplications);
+router.get('/my', auth, applicationController.getUserApplications);
+router.post('/flag-application',auth, applicationController.getJobsWithAppliedFlag);
 
 module.exports = router;

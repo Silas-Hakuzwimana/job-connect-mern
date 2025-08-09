@@ -26,7 +26,7 @@ import NotFound from "./pages/NotFound";
 import JobSeekerDashboard from "./pages/jobseeker/JobSeekerDashboard";
 
 //Components
-import Applications from "./components/jobseeker/Applications";
+import ApplicationsPage from "./components/jobseeker/ApplicationPage";
 import Notifications from "./components/jobseeker/Notifications";
 import Profile from "./components/jobseeker/Profile";
 import Qualifications from "./components/jobseeker/Qualifications";
@@ -167,7 +167,7 @@ export default function App() {
           <Route path="bookmarks" element={<BookMark />} />
           <Route path="profile" element={<Profile />} />
           <Route path="jobs" element={<Jobs />} />
-          <Route path="applications" element={< Applications />} />
+          <Route path="applications" element={< ApplicationsPage />} />
           <Route path="settings" element={<Settings />} />
           <Route path="jobs/:id" element={<JobDetails />} />
           <Route path="qualifications" element={<Qualifications />} />

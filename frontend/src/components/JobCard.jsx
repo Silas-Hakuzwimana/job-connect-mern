@@ -138,16 +138,23 @@ export default function JobCard({ job, isQualified }) {
 
       <div className="flex items-center gap-3 mt-6">
         <button
-          disabled={!isQualified}
+          disabled={!isQualified || job.applied} // disable if not qualified OR already applied
           onClick={handleApplyClick}
           className={`flex-1 px-5 py-2 rounded-md font-semibold transition 
-            ${isQualified
-              ? "bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              : "bg-gray-300 cursor-not-allowed text-gray-500"
+    ${(!isQualified || job.applied)
+              ? "bg-gray-300 cursor-not-allowed text-gray-500"
+              : "bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             }`}
         >
-          Apply
+          {job.applied ? "Applied" : "Apply"}
+
+          {job.applied && (
+            <span className="ml-2 text-green-600 font-semibold text-sm">
+              Already Applied
+            </span>
+          )}
         </button>
+
 
         <button
           onClick={handleBookmark}

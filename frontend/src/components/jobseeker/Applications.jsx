@@ -1,6 +1,10 @@
 import React from 'react';
 
-export default function Applications({ applications = [] }) {
+export default function Applications({ applications = [], loading, error }) {
+
+  if (loading) return <p className="text-center p-4">Loading your applications...</p>;
+  if (error) return <p className="text-center p-4 text-red-600">{error}</p>;
+
   return (
     <div className="p-4 bg-white shadow rounded-lg">
       <h2 className="text-xl font-semibold mb-4 text-center">Your Applications</h2>
@@ -13,6 +17,9 @@ export default function Applications({ applications = [] }) {
               <tr className="bg-gray-100">
                 <th className="border border-gray-200 px-4 py-2 text-left">Job Title</th>
                 <th className="border border-gray-200 px-4 py-2 text-left">Company</th>
+                <th className="border border-gray-200 px-4 py-2 text-left">Location</th>
+                <th className="border border-gray-200 px-4 py-2 text-left">Salary</th>
+                <th className="border border-gray-200 px-4 py-2 text-left">Type</th>
                 <th className="border border-gray-200 px-4 py-2 text-left">Status</th>
                 <th className="border border-gray-200 px-4 py-2 text-left">Applied At</th>
               </tr>
@@ -22,15 +29,17 @@ export default function Applications({ applications = [] }) {
                 <tr key={app._id} className="hover:bg-gray-50">
                   <td className="border border-gray-200 px-4 py-2">{app.jobTitle}</td>
                   <td className="border border-gray-200 px-4 py-2">{app.companyName}</td>
+                  <td className="border border-gray-200 px-4 py-2">{app.companyLocation}</td>
+                  <td className="border border-gray-200 px-4 py-2">{app.jobSalary}</td>
+                  <td className="border border-gray-200 px-4 py-2">{app.jobType}</td>
                   <td className="border border-gray-200 px-4 py-2">
                     <span
-                      className={`inline-block px-2 py-1 text-xs rounded-full ${
-                        app.status === 'pending'
-                          ? 'bg-yellow-100 text-yellow-700'
-                          : app.status === 'accepted'
+                      className={`inline-block px-2 py-1 text-xs rounded-full ${app.status === 'pending'
+                        ? 'bg-yellow-100 text-yellow-700'
+                        : app.status === 'accepted'
                           ? 'bg-green-100 text-green-700'
                           : 'bg-red-100 text-red-700'
-                      }`}
+                        }`}
                     >
                       {app.status}
                     </span>

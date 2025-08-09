@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import JobCard from "../components/JobCard";
 import { fetchJobs, fetchQualificationFlags } from "../services/jobService";
+import { flagApplication } from "../services/applicationService";
 
 export default function Jobs() {
   const [jobs, setJobs] = useState([]);
@@ -24,10 +25,14 @@ export default function Jobs() {
         // 3. Fetch qualification flags for these job IDs
         const flags = await fetchQualificationFlags(jobIds);
 
-        // 4. Combine jobs with their qualification flag
+        // 4. Fetch applied flags (new API)
+        const appliedFlags = await flagApplication(jobIds);
+
+        // 5. Combine jobs with their qualification flag
         const combinedJobs = allJobs.map(job => ({
           ...job,
           qualified: !!flags[job._id], // true or false
+          applied: !!appliedFlags[job._id],
         }));
 
         setJobs(combinedJobs);
