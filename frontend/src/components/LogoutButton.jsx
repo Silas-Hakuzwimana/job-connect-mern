@@ -1,25 +1,35 @@
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+// src/components/LogoutButton.jsx
+import { useNavigate } from "react-router-dom";
+import { LogOut } from "lucide-react";
+import axios from "axios";
 
 const LogoutButton = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:5000/api/auth/logout', {}, { withCredentials: true });
+      await axios.post(
+        "http://localhost:5000/api/auth/logout",
+        {},
+        { withCredentials: true }
+      );
 
-      // Clear user context or local storage
-      localStorage.removeItem('user'); 
+      // Clear stored user data
+      localStorage.removeItem("user");
 
       // Redirect to home page
-      navigate('/');
+      navigate("/");
     } catch (err) {
-      console.error('Logout failed:', err);
+      console.error("Logout failed:", err);
     }
   };
 
   return (
-    <button onClick={handleLogout} className="btn btn-danger">
+    <button
+      onClick={handleLogout}
+      className="flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition"
+    >
+      <LogOut className="w-4 h-4 mr-2" />
       Logout
     </button>
   );

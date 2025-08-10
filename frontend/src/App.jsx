@@ -4,8 +4,11 @@ import { AuthContext } from "./context/AuthContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-// Global layout wrapper
-import Layout from "./components/Layout";
+
+// Dashboards by role
+import JobSeekerDashboard from "./pages/jobseeker/JobSeekerDashboard";
+import CompanyDashboard from "./pages/company/CompanyDashboard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 
 // Public pages
 import Home from "./pages/Home";
@@ -22,24 +25,36 @@ import Profiles from "./pages/Profiles";
 import CompanyManager from "./pages/admin/CompanyManager";
 import NotFound from "./pages/NotFound";
 
-// Dashboards by role
-import JobSeekerDashboard from "./pages/jobseeker/JobSeekerDashboard";
+//Layout components
+import AdminLayout from "./layouts/AdminLayout";
+import JobSeekerLayout from "./layouts/JobSeekerLayout";
 
-//Components
+// Global layout wrapper
+import Layout from "./components/Layout";
+
+//Jobseeker dashboard components
+import BookMark from "./components/jobseeker/BookMark";
+import Settings from "./components/jobseeker/Settings";
 import ApplicationsPage from "./components/jobseeker/ApplicationPage";
 import Notifications from "./components/jobseeker/Notifications";
 import Profile from "./components/jobseeker/Profile";
 import Qualifications from "./components/jobseeker/Qualifications";
 
-import CompanyDashboard from "./pages/company/CompanyDashboard";
-import AdminDashboard from "./pages/admin/AdminDashboard";
+
+//Admin dashboard components
 import UserManagement from "./components/admin/UserManagement";
 import JobManagement from "./components/admin/JobManagement";
 import ApplicationManagement from "./components/admin/ApplicationManager";
-import AdminLayout from "./layouts/AdminLayout";
-import JobSeekerLayout from "./layouts/JobSeekerLayout";
-import BookMark from "./components/jobseeker/BookMark";
-import Settings from "./components/jobseeker/Settings";
+
+//Company dashboard components
+// import CompanyNavbar from "./components/company/CompanyNavbar";
+import CompanyProfileCard from "./components/company/CompanyProfileCard";
+import CompanyStats from "./components/company/CompanyStats";
+import CompanyLayout from "./layouts/CompanyLayout";
+import NotificationsPanel from "./components/company/NotificationsPanel";
+import JobListingsTable from "./components/company/JobListingsTable";
+import ApplicantsList from "./components/company/ApplicantsList";
+import Applications from "./components/company/Applications";
 
 
 
@@ -85,7 +100,7 @@ function PublicRoute({ children }) {
   if (user) {
     const dashboardPaths = {
       admin: "/admin/dashboard",
-      company: "/company/dashboard",
+      employer: "/company/dashboard",
       jobseeker: "/jobseeker/dashboard",
     };
     return <Navigate to={dashboardPaths[user.role] || "/"} replace />;
@@ -178,11 +193,30 @@ export default function App() {
         <Route
           path="/company/dashboard"
           element={
-            <ProtectedRoute roles={["company"]} fallbackPath="/company/dashboard">
-              <CompanyDashboard />
+            <ProtectedRoute roles={["employer"]} fallbackPath="/company/dashboard">
+              <CompanyLayout />
             </ProtectedRoute>
           }
         />
+        {/* This means: /company/dashboard shows ComapnyDashboard */}
+        <Route index element={<CompanyDashboard />} />
+
+        {/* /company/dashboard/stats */}
+        <Route path="stats" element={<CompanyStats />} />
+        {/* /company/dashboard/applicants */}
+        <Route path="applicants" element={<ApplicantsList />} />
+
+        {/* /company/dashboard/jobs */}
+        <Route path="jobs" element={<JobListingsTable />} />
+
+        {/* /company/dashboard/applications */}
+        <Route path="applications" element={<Applications />} />
+
+        {/* /company/dashboard/companies */}
+        <Route path="profile" element={<CompanyProfileCard />} />
+        {/* /company/dashboard/notifications */}
+        <Route path="notifications" element={<NotificationsPanel />} />
+        <Route />
 
         {/* ✅ Admin Dashboard & Nested Routes */}
         <Route
