@@ -27,32 +27,32 @@ const CompanyNavbar = () => {
     },
     {
       name: "Jobs",
-      path: "/company/jobs",
+      path: "/company/dashboard/jobs",
       icon: <Briefcase className="w-5 h-5" />,
     },
     {
       name: "Applicants",
-      path: "/company/applicants",
+      path: "/company/dashboard/applicants",
       icon: <Users className="w-5 h-5" />,
     },
     {
       name: "Applications",
-      path: "/company/applications",
+      path: "/company/dashboard/applications",
       icon: <FileText className="w-5 h-5" />,
     },
     {
       name: "Notifications",
-      path: "/company/notifications",
+      path: "/company/dashboard/notifications",
       icon: <Bell className="w-5 h-5" />,
     },
     {
       name: "Stats",
-      path: "/company/stats",
+      path: "/company/dashboard/stats",
       icon: <BarChart2 className="w-5 h-5" />,
     },
     {
       name: "Profile",
-      path: "/company/profile",
+      path: "/company/dashboard/profile",
       icon: <UserCircle className="w-5 h-5" />,
     },
   ];
