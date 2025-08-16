@@ -56,16 +56,16 @@ const CompanyProfileCard = ({ company }) => {
 
         {/* Details */}
         <div className="space-y-2 text-sm text-gray-600 w-full">
-          {profile.location && (
-            <div className="flex items-center justify-center gap-2">
-              <MapPin className="w-4 h-4 text-gray-400" />
-              {profile.location}
-            </div>
-          )}
           {profile.email && (
             <div className="flex items-center justify-center gap-2">
               <Mail className="w-4 h-4 text-gray-400" />
               {profile.email}
+            </div>
+          )}
+          {profile.location && (
+            <div className="flex items-center justify-center gap-2">
+              <MapPin className="w-4 h-4 text-gray-400" />
+              {profile.location}
             </div>
           )}
           {profile.phone && (
