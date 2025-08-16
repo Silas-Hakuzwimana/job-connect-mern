@@ -1,8 +1,8 @@
-// src/components/company/JobListingsTable.jsx
 import { useEffect, useState } from "react";
 import { Pencil, Trash2, Eye } from "lucide-react";
-import axios from "axios";
 import LoadingSpinner from "../LoadingSpinner";
+import { fetchJobsByCompany } from "../../services/companyApi";
+import { deleteJob } from "../../services/jobService";
 
 const JobListingsTable = () => {
   const [jobs, setJobs] = useState([]);
@@ -10,10 +10,7 @@ const JobListingsTable = () => {
 
   const fetchJobs = async () => {
     try {
-      const res = await axios.get(
-        "http://localhost:5000/api/company/jobs",
-        { withCredentials: true }
-      );
+      const res = await fetchJobsByCompany();
       setJobs(res.data || []);
     } catch (err) {
       console.error("Error fetching jobs:", err);
@@ -26,10 +23,7 @@ const JobListingsTable = () => {
     if (!window.confirm("Are you sure you want to delete this job?")) return;
 
     try {
-      await axios.delete(
-        `http://localhost:5000/api/company/jobs/${id}`,
-        { withCredentials: true }
-      );
+      await deleteJob();
       setJobs(jobs.filter((job) => job.id !== id));
     } catch (err) {
       console.error("Error deleting job:", err);
@@ -70,11 +64,10 @@ const JobListingsTable = () => {
                 <td className="px-4 py-3 font-medium">{job.title}</td>
                 <td className="px-4 py-3">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      job.status === "active"
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${job.status === "active"
                         ? "bg-green-100 text-green-700"
                         : "bg-red-100 text-red-700"
-                    }`}
+                      }`}
                   >
                     {job.status}
                   </span>

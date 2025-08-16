@@ -189,34 +189,35 @@ export default function App() {
           <Route path="notifications" element={<Notifications />} />
         </Route>
 
-        {/* ✅ Company Dashboard (Simple) */}
         <Route
           path="/company/dashboard"
           element={
-            <ProtectedRoute roles={["employer"]} fallbackPath="/company/dashboard">
+            <ProtectedRoute roles={["employer"]} fallbackPath="/login">
               <CompanyLayout />
             </ProtectedRoute>
           }
-        />
-        {/* This means: /company/dashboard shows ComapnyDashboard */}
-        <Route index element={<CompanyDashboard />} />
+        >
+          {/* /company/dashboard */}
+          <Route index element={<CompanyDashboard />} />
 
-        {/* /company/dashboard/stats */}
-        <Route path="stats" element={<CompanyStats />} />
-        {/* /company/dashboard/applicants */}
-        <Route path="applicants" element={<ApplicantsList />} />
+          {/* /company/dashboard/stats */}
+          <Route path="stats" element={<CompanyStats />} />
 
-        {/* /company/dashboard/jobs */}
-        <Route path="jobs" element={<JobListingsTable />} />
+          {/* /company/dashboard/applicants */}
+          <Route path="applicants" element={<ApplicantsList />} />
 
-        {/* /company/dashboard/applications */}
-        <Route path="applications" element={<Applications />} />
+          {/* /company/dashboard/jobs */}
+          <Route path="jobs" element={<JobListingsTable />} />
 
-        {/* /company/dashboard/companies */}
-        <Route path="profile" element={<CompanyProfileCard />} />
-        {/* /company/dashboard/notifications */}
-        <Route path="notifications" element={<NotificationsPanel />} />
-        <Route />
+          {/* /company/dashboard/applications */}
+          <Route path="applications" element={<Applications />} />
+
+          {/* /company/dashboard/profile */}
+          <Route path="profile" element={<CompanyProfileCard />} />
+
+          {/* /company/dashboard/notifications */}
+          <Route path="notifications" element={<NotificationsPanel />} />
+        </Route>
 
         {/* ✅ Admin Dashboard & Nested Routes */}
         <Route

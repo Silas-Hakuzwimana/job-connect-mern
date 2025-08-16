@@ -72,7 +72,7 @@ app.use('/api/applications', applicationRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/bookmarks', bookmarkRoutes);
 app.use('/api/jobseeker', jobSeekerRoutes);
-app.use('/api/companies', companyRoutes);
+app.use('/api/company', companyRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/notifications', notificationRoutes);
 

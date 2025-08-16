@@ -1,46 +1,92 @@
 import api from './api';
 
-export const createNotification = async (userId, message) => {
+// --- Create a notification ---
+export const createNotification = async (
+  userId,
+  message,
+  type = 'info',
+  link = '',
+) => {
   try {
-    const response = await api.post('/notifications/create', {
+    const res = await api.post('/notifications/create', {
       userId,
       message,
+      type,
+      link,
     });
-    return response.data;
-  } catch (error) {
-    console.error('Failed to create notification:', error);
-    throw error;
+    return res.data;
+  } catch (err) {
+    console.error('Failed to create notification:', err);
+    throw err;
   }
 };
 
+// --- Fetch notifications ---
 export const fetchNotifications = async () => {
-  const response = await api.get(`/notifications?ts=${Date.now()}`);
-  return response.data;
+  try {
+    const res = await api.get(`/notifications?ts=${Date.now()}`);
+    return res.data;
+  } catch (err) {
+    console.error('Failed to fetch notifications:', err);
+    throw err;
+  }
 };
 
+// --- Fetch only unhidden notifications ---
+export const fetchUnhiddenNotifications = async () => {
+  try {
+    const res = await api.get(
+      `/notifications/get-unhidden-notifications?ts=${Date.now()}`,
+    );
+    return res.data;
+  } catch (err) {
+    console.error('Failed to fetch unhidden notifications:', err);
+    throw err;
+  }
+};
+
+// --- Mark as read ---
 export const markNotificationAsRead = async (notificationId) => {
-  const response = await api.patch(`/notifications/${notificationId}/read`);
-  return response.data;
+  try {
+    const res = await api.patch(`/notifications/${notificationId}/read`);
+    return res.data;
+  } catch (err) {
+    console.error(
+      `Failed to mark notification ${notificationId} as read:`,
+      err,
+    );
+    throw err;
+  }
 };
 
+// --- Get unread count ---
 export const getNotificationsCount = async () => {
-  const response = await api.get(
-    `/notifications/unread-count?ts=${Date.now()}`,
-  );
-  return response.data.count;
+  try {
+    const res = await api.get(`/notifications/unread-count?ts=${Date.now()}`);
+    return res.data.count;
+  } catch (err) {
+    console.error('Failed to fetch notifications count:', err);
+    throw err;
+  }
 };
 
+// --- Hide / Unhide notifications ---
 export const hideNotification = async (id) => {
-  const res = await api.post(`/notifications/${id}/hide`);
-  return res.data;
+  try {
+    const res = await api.post(`/notifications/${id}/hide`);
+    return res.data;
+  } catch (err) {
+    console.error(`Failed to hide notification ${id}:`, err);
+    throw err;
+  }
 };
 
 export const unhideNotification = async (id) => {
-  const res = await api.post(`/notifications/${id}/unhide`);
-  return res.data;
-};
-
-export const fetchUnhiddenNotifications = async () => {
-  const res = await api.get('/notifications/get-unhidden-notifications');
-  return res.data;
+  try {
+    const res = await api.post(`/notifications/${id}/unhide`);
+    return res.data;
+  } catch (err) {
+    console.error(`Failed to unhide notification ${id}:`, err);
+    throw err;
+  }
 };

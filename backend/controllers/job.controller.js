@@ -1,18 +1,34 @@
 const Job = require('../models/Job');
 const User = require('../models/User');
-const Qualification = require('../models/Qualification');
+const Company = require('../models/Company');
 
 exports.createJob = async (req, res) => {
   try {
-    if (!req.body.qualifications || !req.body.qualifications.length) {
+    const { qualifications, ...jobData } = req.body;
+
+    if (!qualifications || !qualifications.length) {
       return res
         .status(400)
         .json({ error: 'At least one qualification is required.' });
     }
 
-    const job = await Job.create({ ...req.body, postedBy: req.user.id });
+    // Find company by logged-in user ID
+    const company = await Company.findOne({ createdBy: req.user.id });
+    if (!company) {
+      return res.status(404).json({ error: 'Your company profile not found.' });
+    }
+
+    // Create job referencing company ObjectId
+    const job = await Job.create({
+      ...jobData,
+      qualifications,
+      company: company._id,
+      postedBy: req.user.id,
+    });
+
     res.status(201).json(job);
   } catch (err) {
+    console.error(err);
     res
       .status(400)
       .json({ error: 'Job creation failed', details: err.message });

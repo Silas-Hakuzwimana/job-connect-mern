@@ -1,24 +1,19 @@
 import { useEffect, useState } from "react";
 import { Building2, MapPin, Mail, Phone, X } from "lucide-react";
-import { fetchMyCompanyProfile, updateMyCompanyProfile } from "../../services/companyApi";
+import { updateMyCompanyProfile } from "../../services/companyApi";
 import { toast } from "react-toastify";
 
-const CompanyProfileCard = () => {
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+const CompanyProfileCard = ({ company }) => {
+  const [profile, setProfile] = useState(company || null);
   const [editOpen, setEditOpen] = useState(false);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState(company || {});
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetchMyCompanyProfile()
-      .then((res) => {
-        setProfile(res.data);
-        setFormData(res.data); // initialize form with current profile
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+    setProfile(company);
+    setFormData(company);
+  }, [company]);
+
 
   const handleSave = () => {
     setSaving(true);
@@ -35,7 +30,6 @@ const CompanyProfileCard = () => {
       .finally(() => setSaving(false));
   };
 
-  if (loading) return <div>Loading profile...</div>;
   if (!profile) return <div>No profile found.</div>;
 
   return (
