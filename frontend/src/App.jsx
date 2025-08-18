@@ -45,16 +45,18 @@ import Qualifications from "./components/jobseeker/Qualifications";
 import UserManagement from "./components/admin/UserManagement";
 import JobManagement from "./components/admin/JobManagement";
 import ApplicationManagement from "./components/admin/ApplicationManager";
+import AdminSettings from "./components/admin/Settings";
 
 //Company dashboard components
-// import CompanyNavbar from "./components/company/CompanyNavbar";
-import CompanyProfileCard from "./components/company/CompanyProfileCard";
-import CompanyStats from "./components/company/CompanyStats";
+import CompanyDetails from "./components/company/CompanyDetails";
+import CompStats from "./components/company/CompStats";
 import CompanyLayout from "./layouts/CompanyLayout";
 import NotificationsPanel from "./components/company/NotificationsPanel";
 import JobListingsTable from "./components/company/JobListingsTable";
 import ApplicantsList from "./components/company/ApplicantsList";
 import Applications from "./components/company/Applications";
+import PostJob from "./components/company/PostJob";
+import CompanySettings from "./components/company/Settings";
 
 
 
@@ -201,7 +203,7 @@ export default function App() {
           <Route index element={<CompanyDashboard />} />
 
           {/* /company/dashboard/stats */}
-          <Route path="stats" element={<CompanyStats />} />
+          <Route path="stats" element={<CompStats />} />
 
           {/* /company/dashboard/applicants */}
           <Route path="applicants" element={<ApplicantsList />} />
@@ -213,10 +215,16 @@ export default function App() {
           <Route path="applications" element={<Applications />} />
 
           {/* /company/dashboard/profile */}
-          <Route path="profile" element={<CompanyProfileCard />} />
+          <Route path="profile" element={<CompanyDetails />} />
 
           {/* /company/dashboard/notifications */}
           <Route path="notifications" element={<NotificationsPanel />} />
+
+          {/* /company/dashboard/post-job */}
+          <Route path="post-job" element={<PostJob />} />
+
+          {/* /company/dashboard/settings */}
+          <Route path="settings" element={<CompanySettings />} />
         </Route>
 
         {/* ✅ Admin Dashboard & Nested Routes */}
@@ -242,6 +250,8 @@ export default function App() {
 
           {/* /admin/dashboard/companies */}
           <Route path="companies" element={<CompanyManager />} />
+          {/* /admin/dashboard/settings */}
+          <Route path="settings" element={<AdminSettings />} />
         </Route>
 
 

@@ -105,7 +105,14 @@ const JobSeekerDashboard = () => {
                   </p>
                 </div>
                 <div className="text-sm text-gray-500">
-                  {new Date(app.appliedAt || app.createdAt).toLocaleDateString()}
+                  {new Date(app.appliedAt || app.createdAt).toLocaleString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                  })}
                 </div>
               </li>
             ))}

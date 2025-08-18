@@ -63,7 +63,7 @@ export default function Jobs() {
       filtered = filtered.filter(
         (job) =>
           job.title?.toLowerCase().includes(query) ||
-          job.company?.toLowerCase().includes(query) ||
+          job.companyName?.toLowerCase().includes(query) ||
           job.description?.toLowerCase().includes(query)
       );
     }
@@ -124,7 +124,7 @@ export default function Jobs() {
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {currentJobs.map((job) => (
-              <JobCard key={job._id} job={job} isQualified={job.qualified} />
+              <JobCard key={job._id} job={job} isQualified={job.qualified} companyName={job.companyName} />
             ))}
           </div>
 
@@ -134,8 +134,8 @@ export default function Jobs() {
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((prev) => prev - 1)}
               className={`px-3 py-1 border rounded-md ${currentPage === 1
-                  ? "text-gray-400 border-gray-300"
-                  : "text-blue-600 border-blue-400 hover:bg-blue-50"
+                ? "text-gray-400 border-gray-300"
+                : "text-blue-600 border-blue-400 hover:bg-blue-50"
                 }`}
             >
               Previous
@@ -146,8 +146,8 @@ export default function Jobs() {
                 key={idx}
                 onClick={() => setCurrentPage(idx + 1)}
                 className={`px-3 py-1 border rounded-md ${currentPage === idx + 1
-                    ? "bg-blue-500 text-white"
-                    : "text-blue-600 border-blue-400 hover:bg-blue-50"
+                  ? "bg-blue-500 text-white"
+                  : "text-blue-600 border-blue-400 hover:bg-blue-50"
                   }`}
               >
                 {idx + 1}
@@ -158,8 +158,8 @@ export default function Jobs() {
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage((prev) => prev + 1)}
               className={`px-3 py-1 border rounded-md ${currentPage === totalPages
-                  ? "text-gray-400 border-gray-300"
-                  : "text-blue-600 border-blue-400 hover:bg-blue-50"
+                ? "text-gray-400 border-gray-300"
+                : "text-blue-600 border-blue-400 hover:bg-blue-50"
                 }`}
             >
               Next

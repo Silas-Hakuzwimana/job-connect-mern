@@ -27,4 +27,12 @@ router.delete('/qualifications/:id', adminController.deleteQualification);
 
 router.get('/dashboard-stats', adminController.getDashboardStats);
 
+//companies routes
+
+// Fetch all companies
+router.get('/companies', adminController.getAllCompanies);
+
+// Fetch single company by ID
+router.get('/companies/:id', adminController.getCompanyById);
+
 module.exports = router;

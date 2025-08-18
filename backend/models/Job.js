@@ -36,12 +36,26 @@ const jobSchema = new mongoose.Schema(
       enum: ['approved', 'rejected', 'pending'],
       default: 'pending',
     },
+    deadline: { type: Date, required: true },
   },
   { timestamps: true },
 );
 
 jobSchema.virtual('hasRequiredQualifications').get(function () {
   return this.qualifications && this.qualifications.length > 0;
+});
+
+// Virtual to check if job has expired
+jobSchema.virtual('isExpired').get(function () {
+  return new Date() > this.deadline;
+});
+
+// Pre-save hook to automatically deactivate expired jobs
+jobSchema.pre('save', function (next) {
+  if (this.deadline && new Date() > this.deadline) {
+    this.isActive = false;
+  }
+  next();
 });
 
 jobSchema.set('toJSON', { virtuals: true });

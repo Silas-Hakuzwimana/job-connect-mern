@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { addBookmark } from "../services/bookmarkService";
-import { applyToJob } from "../services/jobService"; // Adjust path if needed
+import { applyToJob } from "../services/jobService";
 import { Bookmark, BookmarkCheck } from "lucide-react";
 import { toast } from "react-toastify";
+import Countdown from "./company/CountDown";
 
 export default function JobCard({ job, isQualified }) {
   const [bookmarked, setBookmarked] = useState(false);
@@ -38,8 +39,8 @@ export default function JobCard({ job, isQualified }) {
       await applyToJob({
         jobId: job._id,
         resumeFile,
-        coverLetter: coverLetterFile || coverLetterText, // file or text
-        qualifications: [], // add qualifications if needed
+        coverLetter: coverLetterFile || coverLetterText,
+        qualifications: [],
       });
       toast.success("Application submitted!");
       setShowModal(false);
@@ -54,132 +55,105 @@ export default function JobCard({ job, isQualified }) {
     }
   };
 
+  const isDeadlineUrgent = () => {
+    if (!job.deadline) return false;
+    const diff = new Date(job.deadline) - new Date();
+    return diff <= 3 * 24 * 60 * 60 * 1000; // 3 days
+  };
+
   return (
-    <div className="border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-lg transition-shadow bg-white max-w-md mx-auto">
+    <div className="relative border border-gray-200 rounded-xl p-6 shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-xl bg-white max-w-md mx-auto my-4">
 
-      <h2 className="text-2xl font-semibold text-gray-900"><span className="bg-blue-800 border border-blue-300 text-white px-3 py-1 rounded shadow-sm">Job Title: </span>
-        <br>
-        </br>
-        {job.title}</h2>
-
-      <p className="text-gray-700 mt-3"><span className="font-semibold">Description: </span>
-        <br>
-        </br>
-        {job.description}</p>
-
-      <p className="text-sm mt-4">
-        <span className="font-semibold">Qualification(s): </span>
-        {job.qualifications && job.qualifications.length > 0 ? (
-          <span className="inline-flex flex-wrap gap-2 ml-1 mt-2">
-            {Array.isArray(job.qualifications)
-              ? job.qualifications.map((qual, idx) => (
-                <span
-                  key={idx}
-                  className="bg-blue-100 border border-blue-300 text-blue-800 px-3 py-1 rounded shadow-sm"
-                >
-                  {qual}
-                </span>
-              ))
-              : job.qualifications
-                .split(',')
-                .map((qual, idx) => (
-                  <span
-                    key={idx}
-                    className="bg-blue-100 border border-blue-300 text-blue-800 px-3 py-1 rounded shadow-sm"
-                  >
-                    {qual.trim()}
-                  </span>
-                ))}
-          </span>
-        ) : (
-          <span className="text-gray-500 italic ml-1">Not specified</span>
-        )}
-      </p>
-
-      <p className="text-sm mt-1 text-gray-600">
-        <span className="font-semibold">Location: </span>
-        {job.location || "Not specified"}
-      </p>
-
-      <p className="text-sm mt-1 text-gray-600">
-        <span className="font-semibold">Company: </span>
-        {job.company || "Not specified"}
-      </p>
-
-      <p className="text-sm mt-1 text-gray-700">
-        <span className="font-semibold">Salary: </span>
-        {job.salary ? `${job.salary} USD` : 'Not specified'}
-      </p>
-
-      <p className="text-sm mt-1 text-gray-700">
-        <span className="font-semibold">Type: </span>
-        {job.salary ? `${job.type}` : 'Not specified'}
-      </p>
-
-
-      <p className="mt-3">
-        {isQualified ? (
-          <span className="text-green-600 font-semibold inline-flex items-center gap-1">
-            Qualified <span>✔️</span>
-          </span>
-        ) : (
-          <span className="text-red-600 font-semibold inline-flex items-center gap-1">
-            Not Qualified <span>❌</span>
-          </span>
-        )}
-      </p>
-
-
-      <p className="text-sm mt-1">
-        <span className="font-semibold">Status: </span>
-        {job.isActive === true ? (
-          <span className="text-green-600 font-semibold">Active</span>
-        ) : job.isActive === false ? (
-          <span className="text-red-600 font-semibold">Inactive</span>
-        ) : (
-          <span className="text-gray-500 italic">Not specified</span>
-        )}
-      </p>
-
-
-      <div className="flex items-center gap-3 mt-6">
-        <button
-          disabled={!isQualified || job.applied} // disable if not qualified OR already applied
-          onClick={handleApplyClick}
-          className={`flex-1 px-5 py-2 rounded-md font-semibold transition 
-    ${(!isQualified || job.applied)
-              ? "bg-gray-300 cursor-not-allowed text-gray-500"
-              : "bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            }`}
-        >
-          {job.applied ? "Applied" : "Apply"}
-
-          {job.applied && (
-            <span className="ml-2 text-green-600 font-semibold text-sm">
-              Already Applied
-            </span>
-          )}
-        </button>
-
-
+      {/* Job Header */}
+      <div className="flex justify-between items-start">
+        <h2 className="text-2xl font-semibold text-gray-900">{job.title}</h2>
         <button
           onClick={handleBookmark}
           disabled={bookmarked}
-          className={`p-2 rounded-md transition flex items-center justify-center
-            ${bookmarked
-              ? "bg-green-500 text-white hover:bg-green-600"
-              : "bg-yellow-400 text-black hover:bg-yellow-500"
-            }`}
+          className={`p-2 rounded-full transition flex items-center justify-center
+            ${bookmarked ? "bg-green-500 text-white hover:bg-green-600" : "bg-yellow-400 text-black hover:bg-yellow-500"}`}
           aria-label={bookmarked ? "Bookmarked" : "Bookmark"}
         >
           {bookmarked ? <BookmarkCheck size={20} /> : <Bookmark size={20} />}
         </button>
       </div>
 
-      {/* Modal */}
+      {/* Company & Location */}
+      <p className="text-gray-600 mt-2 text-sm">
+        <span className="font-semibold">Company: </span>{job.companyName || "Not specified"}<br />
+        <span className="font-semibold">Location: </span>{job.location || "Not specified"}
+      </p>
+
+      {/* Job Description */}
+      <p className="text-gray-700 mt-3">
+        <span className="font-semibold">
+          Job description:
+        </span>
+        <br>
+        </br>
+        {job.description}</p>
+
+      {/* Qualifications */}
+      <div className="mt-3 flex flex-wrap gap-2">
+        <span className="font-semibold w-full">Qualification(s): </span>
+        {job.qualifications && job.qualifications.length > 0 ? (
+          job.qualifications.map((qual, idx) => (
+            <span
+              key={idx}
+              className="bg-blue-100 border border-blue-300 text-blue-800 px-3 py-1 rounded-full text-sm shadow-sm transform transition-all duration-300 hover:scale-105 hover:bg-blue-200"
+            >
+              {qual}
+            </span>
+          ))
+        ) : (
+          <span className="text-gray-500 italic ml-1">Not specified</span>
+        )}
+      </div>
+
+      {/* Salary & Type */}
+      <div className="flex gap-4 mt-3 text-sm text-gray-700">
+        <p><span className="font-semibold">Salary: </span>{job.salary ? `${job.salary} USD` : "Not specified"}</p>
+        <p><span className="font-semibold">Type: </span>{job.type || "Not specified"}</p>
+      </div>
+
+      {/* Status & Qualification */}
+      <div className="flex gap-4 mt-3">
+        <p className="font-semibold">Status: </p>
+        <span className={`font-semibold ${job.isActive ? "text-green-600" : "text-red-600"}`}>
+          {job.isActive ? "Active" : "Inactive"}
+        </span>
+        <span className={`font-semibold ${isQualified ? "text-green-600" : "text-red-600"}`}>
+          {isQualified ? "Qualified ✔️" : "Not Qualified ❌"}
+        </span>
+      </div>
+
+      {/* Deadline */}
+      {job.deadline && (
+        <div className={`mt-3 p-2 rounded-md text-sm ${isDeadlineUrgent() ? "bg-red-100 text-red-700 font-bold" : "bg-gray-100 text-gray-700"}`}>
+          <span className="font-semibold">Deadline: </span>
+          <Countdown deadline={job.deadline} />
+        </div>
+      )}
+
+      {/* Apply Button */}
+      <div className="flex items-center gap-3 mt-6">
+        <button
+          disabled={!isQualified || job.applied}
+          onClick={handleApplyClick}
+          className={`flex-1 px-5 py-2 rounded-md font-semibold transition-all duration-300
+            ${(!isQualified || job.applied) ? "bg-gray-300 cursor-not-allowed text-gray-500" : "bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:scale-105"}`}
+        >
+          {job.applied ? "Applied" : "Apply"}
+        </button>
+      </div>
+
+      {/* Animated Application Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4 transition-opacity duration-300"
+          style={{ animation: "fadeIn 0.3s ease forwards" }}
+        >
+          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 transform transition-transform duration-300 scale-90 animate-modalPop">
             <h2 className="text-xl font-semibold mb-5 text-gray-900">Submit Application</h2>
 
             <label className="block mb-4">
@@ -246,6 +220,19 @@ export default function JobCard({ job, isQualified }) {
           </div>
         </div>
       )}
+
+      {/* Tailwind Custom Animation */}
+      <style>
+        {`
+          @keyframes modalPop {
+            0% { opacity: 0; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+          }
+          .animate-modalPop {
+            animation: modalPop 0.25s ease-out forwards;
+          }
+        `}
+      </style>
     </div>
   );
 }

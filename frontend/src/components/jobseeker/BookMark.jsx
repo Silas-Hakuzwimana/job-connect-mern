@@ -40,7 +40,7 @@ export default function BookMark() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-center">Your Bookmarks</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center"> Bookmarks</h1>
 
       {bookmarks.length === 0 ? (
         <p className="text-gray-500 text-center">No bookmarks found.</p>

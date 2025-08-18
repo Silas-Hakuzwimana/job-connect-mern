@@ -48,7 +48,7 @@ export default function JobManagement() {
   // Filter and search jobs
   const filteredJobs = jobs.filter(job => {
     const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.company.toLowerCase().includes(searchTerm.toLowerCase());
+      job.companyName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || job.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -63,7 +63,7 @@ export default function JobManagement() {
       case 'title':
         return a.title.localeCompare(b.title);
       case 'company':
-        return a.company.localeCompare(b.company);
+        return a.companyName.localeCompare(b.company);
       case 'status':
         return a.status.localeCompare(b.status);
       default:
@@ -400,7 +400,7 @@ export default function JobManagement() {
                     <div className="text-sm font-medium text-gray-900">{job.title}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{job.company}</div>
+                    <div className="text-sm text-gray-900">{job.companyName}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {getStatusBadge(job.status)}

@@ -29,7 +29,7 @@ export const fetchQualificationFlags = async (jobIds) => {
   return res.data; // object { jobId1: true, jobId2: false, ... }
 };
 
-export const postJob = async (jobData) => {
+export const createJob = async (jobData) => {
   const res = await api.post('/jobs', jobData);
   return res.data;
 };

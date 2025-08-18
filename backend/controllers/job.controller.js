@@ -36,11 +36,44 @@ exports.createJob = async (req, res) => {
 };
 
 exports.getAllJobs = async (req, res) => {
-  const jobs = await Job.find({ isActive: true, status: 'approved' }).populate(
-    'postedBy',
-    'name email',
-  );
-  res.json(jobs);
+  try {
+    // Fetch all approved active jobs and populate postedBy user
+    const jobs = await Job.find({ isActive: true, status: 'approved' })
+      .populate('postedBy', 'name email company'); // ensure postedBy.company exists if needed
+
+    // Collect all company IDs from jobs
+    const companyIds = jobs
+      .filter(job => job.company)
+      .map(job => job.company.toString());
+
+    // Fetch companies once
+    const companies = await Company.find({ _id: { $in: companyIds } });
+    const companyMap = companies.reduce((acc, c) => {
+      acc[c._id.toString()] = c.name;
+      return acc;
+    }, {});
+
+    // Add companyName field to each job
+    const jobsWithCompanyName = jobs.map(job => {
+      let companyName = 'Unknown Company';
+
+      if (job.company && companyMap[job.company.toString()]) {
+        companyName = companyMap[job.company.toString()];
+      } else if (job.postedBy?.company?.name) {
+        companyName = job.postedBy.company.name;
+      }
+
+      return {
+        ...job.toObject(),
+        companyName,
+      };
+    });
+
+    res.json(jobsWithCompanyName);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to fetch jobs' });
+  }
 };
 
 /**

@@ -5,7 +5,12 @@ export const fetchUsers = async () => {
   return await api.get('/admin/users');
 };
 
-export const updateUserRole = (id, role) =>{
+//fetch companies
+export const fetchCompanies = async () => {
+  return await api.get('/admin/companies');
+};
+
+export const updateUserRole = (id, role) => {
   api.put(`/admin/users/${id}/role`, { role });
 };
 

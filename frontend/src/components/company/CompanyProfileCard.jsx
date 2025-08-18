@@ -11,31 +11,35 @@ const CompanyProfileCard = ({ company }) => {
 
   useEffect(() => {
     setProfile(company);
-    setFormData(company);
+    setFormData(company || {});
   }, [company]);
 
+  const handleSave = async () => {
+    if (!formData.name?.trim()) {
+      toast.error("Company name is required.");
+      return;
+    }
 
-  const handleSave = () => {
-    setSaving(true);
-    updateMyCompanyProfile(formData)
-      .then((res) => {
-        setProfile(res.data);
-        toast.success("Profile updated successfully!");
-        setEditOpen(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        toast.error("Failed to update profile.");
-      })
-      .finally(() => setSaving(false));
+    try {
+      setSaving(true);
+      const res = await updateMyCompanyProfile(formData);
+      setProfile(res.data);
+      toast.success("Profile updated successfully!");
+      setEditOpen(false);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update profile.");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  if (!profile) return <div>No profile found.</div>;
+  if (!profile) return <div className="text-center text-gray-500">No profile found.</div>;
 
   return (
     <>
+      {/* Profile Card */}
       <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col items-center text-center max-w-md mx-auto">
-        {/* Logo */}
         <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden mb-4">
           {profile.logoUrl ? (
             <img
@@ -48,13 +52,9 @@ const CompanyProfileCard = ({ company }) => {
           )}
         </div>
 
-        {/* Company Name */}
-        <h2 className="text-lg font-semibold text-gray-800">{profile.name || "Company Name"}</h2>
-
-        {/* Industry */}
+        <h2 className="text-lg font-semibold text-gray-800">{profile.name}</h2>
         <p className="text-sm text-gray-500 mb-4">{profile.industry || "Industry not set"}</p>
 
-        {/* Details */}
         <div className="space-y-2 text-sm text-gray-600 w-full">
           {profile.email && (
             <div className="flex items-center justify-center gap-2">
@@ -76,7 +76,6 @@ const CompanyProfileCard = ({ company }) => {
           )}
         </div>
 
-        {/* Edit Profile Button */}
         <button
           onClick={() => setEditOpen(true)}
           className="mt-6 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg shadow-sm transition"
@@ -107,12 +106,12 @@ const CompanyProfileCard = ({ company }) => {
               className="space-y-4"
             >
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
                 <input
                   type="text"
                   value={formData.name || ""}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md p-2"
+                  className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   required
                 />
               </div>
@@ -123,7 +122,7 @@ const CompanyProfileCard = ({ company }) => {
                   type="text"
                   value={formData.industry || ""}
                   onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md p-2"
+                  className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
 
@@ -133,7 +132,7 @@ const CompanyProfileCard = ({ company }) => {
                   type="text"
                   value={formData.location || ""}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md p-2"
+                  className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
 
@@ -143,7 +142,7 @@ const CompanyProfileCard = ({ company }) => {
                   type="email"
                   value={formData.email || ""}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md p-2"
+                  className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
 
@@ -153,7 +152,7 @@ const CompanyProfileCard = ({ company }) => {
                   type="tel"
                   value={formData.phone || ""}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md p-2"
+                  className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
 

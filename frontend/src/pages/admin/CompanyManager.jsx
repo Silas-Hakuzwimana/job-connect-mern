@@ -11,10 +11,14 @@ export default function CompanyManager() {
   const loadCompanies = async () => {
     try {
       setLoading(true);
-      const { data } = await fetchCompanies();
-      setCompanies(data);
-    } catch {
+      const res = await fetchCompanies();
+      console.log(res); // check what comes back
+      const list = Array.isArray(res) ? res : res.data;
+      setCompanies(list || []);
+    } catch (err) {
+      console.error(err);
       alert('Failed to load companies');
+      setCompanies([]);
     } finally {
       setLoading(false);
     }
@@ -150,6 +154,9 @@ export default function CompanyManager() {
                       <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
                         Location
                       </th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                        Status
+                      </th>
                       <th className="px-6 py-4 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider">
                         Actions
                       </th>
@@ -200,6 +207,20 @@ export default function CompanyManager() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
                           {company.location || 'Not specified'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${company.status === 'pending'
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : company.status === 'approved'
+                                  ? 'bg-green-100 text-green-800'
+                                  : company.status === 'rejected'
+                                    ? 'bg-red-100 text-red-800'
+                                    : 'bg-slate-100 text-slate-800'
+                              }`}
+                          >
+                            {company.status ? company.status.charAt(0).toUpperCase() + company.status.slice(1) : 'Not specified'}
+                          </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex items-center justify-end space-x-2">

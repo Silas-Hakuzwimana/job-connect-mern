@@ -30,49 +30,51 @@ const CompanyDashboard = () => {
 
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!user?.id) return;
+    if (!user?.id) return; // only fetch when we really have a logged-in user
 
+    let isMounted = true; // prevent state updates if unmounted
+
+    const fetchData = async () => {
       setLoadingData(true);
       try {
         const companyProfile = await fetchMyCompanyProfile();
         if (!companyProfile?._id) {
-          console.error('No company profile found');
-          setLoadingData(false);
+          console.error("No company profile found");
           return;
         }
 
+        if (!isMounted) return;
         setCompanyProfile(companyProfile);
 
         const companyId = companyProfile._id;
-        console.log('Fetching jobs for companyId:', companyId);
-
-        // Only call fetchJobsByCompany if companyId exists
         const [jobsRes, notifRes, statsRes] = await Promise.all([
           fetchJobsByCompany(companyId),
           fetchNotifications(),
-          fetchCompanyStats()
+          fetchCompanyStats(),
         ]);
 
+        if (!isMounted) return;
         setJobs(jobsRes?.jobs || []);
         setNotifications(
-          (notifRes?.data || []).filter(n => !n.hiddenBy?.includes(user.id))
+          (notifRes?.data || []).filter((n) => !n.hiddenBy?.includes(user.id))
         );
-
         setStats({
           totalJobs: statsRes?.totalJobs || 0,
           totalApplicants: statsRes?.totalApplicants || 0,
           newNotifications: (notifRes?.data || []).length,
         });
-
       } catch (err) {
-        console.error('Error fetching dashboard data:', err);
+        console.error("Error fetching dashboard data:", err);
       } finally {
-        setLoadingData(false);
+        if (isMounted) setLoadingData(false);
       }
     };
 
     fetchData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [user?.id]);
 
 
@@ -95,11 +97,12 @@ const CompanyDashboard = () => {
         </p>
       </header>
 
+      <h1 className="text-3xl font-bold mb-6">My Company Profile</h1>
       {/* Company profile */}
       <CompanyProfileCard company={companyProfile} />
 
       {/* Company Stats */}
-      <CompanyStats stats={stats} onPostJobClick={() => navigate("/company/post-job")} />
+      <CompanyStats stats={stats} onPostJobClick={() => navigate("/company/dashboard/post-job")} />
 
       {/* Job Listings Section */}
       <section className="mt-10 bg-white rounded-xl shadow-sm p-6">
