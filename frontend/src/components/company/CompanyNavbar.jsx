@@ -37,7 +37,7 @@ export default function CompanyNavbar() {
   const handleLogout = async () => {
     try {
       await logout();
-      toast.success("Logged out successfully");
+      //toast.success("Logged out successfully");
       navigate("/login");
     } catch (err) {
       toast.error("Logout failed");
