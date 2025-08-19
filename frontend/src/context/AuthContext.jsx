@@ -1,79 +1,73 @@
-import React, { useState, useEffect, createContext } from "react";
-import { getCurrentUser } from "../services/authService";
+/* eslint-disable react-refresh/only-export-components */
+import React, { createContext, useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { logout as logoutService, getCurrentUser } from '../services/authService';
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
-  // Move fetchUser outside useEffect so you can call it anywhere inside AuthProvider
-  const fetchUser = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setUser(null);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const userData = await getCurrentUser();
-      setUser(userData);
-    } catch (error) {
-      console.error('Failed to fetch user:', error);
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Fetch user on mount
   useEffect(() => {
-    if (!user) {
-      fetchUser(); // ✅ initial fetch
-    }
-  }, [user]);
+    const fetchUser = async () => {
+      try {
+        const currentUser = await getCurrentUser();
+        setUser(currentUser || null);
+      } catch {
+        setUser(null);
+      } finally {
+        setLoading(false);
+        setIsAuthChecked(true); // ✅ prevent redirects until check finishes
+      }
+    };
+    fetchUser();
+  }, []);
 
-  const login = async (userData) => {
-    setUser(userData);
-    if (userData.token) {
-      localStorage.setItem('token', userData.token);
+  const login = (userData) => setUser(userData);
+
+  const logout = async () => {
+    if (loggingOut) return;
+    setLoggingOut(true);
+
+    try {
+      await logoutService();
+      toast.success('Logged out successfully');
+    } catch (err) {
+      console.error('Logout error:', err);
+      toast.error('Logout failed');
+    } finally {
+      setUser(null);
+      setLoggingOut(false);
     }
   };
 
-
-  const refreshUser = async (force = false) => {
+  const refreshUser = async () => {
     try {
-      if (user && force) return user;
-      const userData = await getCurrentUser();
-      setUser(userData);
-      return userData;
+      const currentUser = await getCurrentUser();
+      setUser(currentUser || null);
+      return currentUser;
     } catch {
       setUser(null);
       return null;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-  const logout = async () => {
-    try {
-      await fetch("/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-    } catch (err) {
-      console.error("Logout error:", err);
-    } finally {
-      localStorage.clear();
-      sessionStorage.clear();
-      setUser(null);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, refreshUser }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        isAuthChecked,
+        login,
+        logout,
+        refreshUser,
+        setUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

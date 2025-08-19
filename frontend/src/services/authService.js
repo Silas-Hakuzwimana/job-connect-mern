@@ -6,7 +6,6 @@ export const login = async (credentials) => {
 };
 
 export const verifyOtp = async (data) => {
-  // Make the API call to verify OTP
   const res = await api.post('/auth/verify-otp', data);
   return res.data;
 };
@@ -22,26 +21,21 @@ export const forgotPassword = async (data) => {
 };
 
 export const resetPassword = async ({ email, token, password }) => {
-  // Validate input
   if (!email || !token || !password) {
     throw new Error('Email, token, and password are required');
   }
-  // Make the API call to reset password
-  const res = await api.post(`/auth/reset-password/${token}`, {
-    token,
-    password,
-  });
+  const res = await api.post(`/auth/reset-password/${token}`, { token, password });
   return res.data;
 };
 
 export const logout = async () => {
-  const res = await api.post('/auth/logout');
-  return res.data;
+  // plain API call only
+  return await api.post('/auth/logout');
 };
 
 export const getCurrentUser = async () => {
   const res = await api.get('/auth/me');
-  return res.data;
+  return res.data.user;
 };
 
 export default {
@@ -52,5 +46,4 @@ export default {
   forgotPassword,
   resetPassword,
   getCurrentUser,
-  // Add any other auth-related methods here
 };

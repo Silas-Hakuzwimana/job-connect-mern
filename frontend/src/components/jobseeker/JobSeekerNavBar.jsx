@@ -1,5 +1,5 @@
 import { useState, useContext, useRef, useEffect } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { Briefcase, User } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
 import { toast } from "react-toastify";
@@ -12,20 +12,16 @@ export default function JobSeekerNavbar() {
   const [notificationsCount, setNotificationsCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
   const pollingInterval = useRef(null);
 
   const handleLogout = async () => {
     try {
       await logout();
-      toast.success("Logged out successfully");
     } catch (error) {
       console.error("Logout failed:", error);
       toast.error("Logout failed");
-    } finally {
-      navigate("/login");
-    }
+    } 
   };
 
   const loadCount = async () => {
@@ -50,7 +46,7 @@ export default function JobSeekerNavbar() {
     return () => clearInterval(pollingInterval.current);
   }, []);
 
-  const profileImg = user?.profilePicture || null;
+  const profileImg = user?.profilePic || null; 
 
   if (loading) return <p className="text-center p-4">Loading notifications...</p>;
   if (error) return <p className="text-center p-4 text-red-600">{error}</p>;

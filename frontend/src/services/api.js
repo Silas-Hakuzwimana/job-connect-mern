@@ -29,7 +29,7 @@ api.interceptors.response.use(
         // clear token on auth failure
         localStorage.removeItem('token');
         //optionally redirect to login
-        window.location.href = '/login';
+        // window.location.href = '/login';
       }
     }
     return Promise.reject(error);

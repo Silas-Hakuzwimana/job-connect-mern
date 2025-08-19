@@ -5,17 +5,26 @@ import { Outlet } from "react-router-dom";
 
 export default function JobSeekerLayout() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <JobSeekerHeader />
-      <JobSeekerNavbar />
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="w-full">
+        <JobSeekerHeader />
+      </header>
 
-      {/* Main content area */}
-      <main className="flex-1 bg-gray-50 p-6">
+      {/* Navbar */}
+      <nav className="w-full">
+        <JobSeekerNavbar />
+      </nav>
+
+      {/* Main content */}
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <Outlet />
       </main>
 
       {/* Footer */}
-      <JobSeekerFooter />
+      <footer className="w-full mt-auto">
+        <JobSeekerFooter />
+      </footer>
     </div>
   );
 }

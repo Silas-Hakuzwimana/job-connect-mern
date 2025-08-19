@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 const { generateToken } = require('../services/token.service');
 const {
   sendOTPEmail,
@@ -89,12 +90,20 @@ exports.verifyOTP = async (req, res) => {
     const token = generateToken(user);
 
     // Send response
+    // res
+    //   .cookie('token', token, {
+    //     httpOnly: true,
+    //     secure: process.env.NODE_ENV === 'development',
+    //     //sameSite: 'Strict', // or 'Lax' depending on frontend/backend domains
+    //     maxAge: 24 * 60 * 60 * 1000, // 1 day
+    //   })
+
     res
       .cookie('token', token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'development',
-        //sameSite: 'Strict', // or 'Lax' depending on frontend/backend domains
-        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        secure: false, // force false for local dev (http)
+        sameSite: 'Lax', // 'Lax' allows sending cookies on top-level navigation
+        maxAge: 24 * 60 * 60 * 1000,
       })
       .status(200)
       .json({
