@@ -102,7 +102,11 @@ const NotificationsPanel = () => {
                 <div>
                   <p className="text-gray-800 text-sm font-medium">{note.message}</p>
                   <p className="text-xs text-gray-500 mt-0.5">
-                    {new Date(note.createdAt).toLocaleString()}
+                    {new Date(note.createdAt).toLocaleString('en-GB',{
+                      day:"2-digit",
+                      month:"short",
+                      year:"numeric"
+                    })}
                   </p>
                 </div>
               </div>

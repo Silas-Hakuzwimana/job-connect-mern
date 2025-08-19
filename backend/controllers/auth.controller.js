@@ -128,11 +128,13 @@ exports.getCurrentUser = async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    console.log('User: ', user);
     res.status(200).json({
       user: {
         name: user.name,
         email: user.email,
         role: user.role,
+        profilePic: user.profilePic,
         id: user._id,
       },
     });
