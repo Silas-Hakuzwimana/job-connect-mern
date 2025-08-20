@@ -1,12 +1,17 @@
 const dotenv = require('dotenv');
-const logger = require('../services/logger.service'); 
+const logger = require('../services/logger.service');
 
-// Load .env file
-const result = dotenv.config();
+// Load .env only in development
+if (process.env.NODE_ENV !== 'production') {
+  const result = dotenv.config();
 
-if (result.error) {
-  logger.error('❌ Failed to load .env file', result.error);
-  process.exit(1);
+  if (result.error) {
+    logger.warn(
+      '⚠️ No .env file found, relying on system environment variables',
+    );
+  } else {
+    logger.info('✅ .env file loaded');
+  }
 }
 
 // Define required environment variables
@@ -21,14 +26,16 @@ const requiredEnvVars = [
   'SMTP_PASS',
   'CLOUDINARY_CLOUD_NAME',
   'CLOUDINARY_API_KEY',
-  'CLOUDINARY_API_SECRET'
+  'CLOUDINARY_API_SECRET',
 ];
 
 // Validate required environment variables
 const missingVars = requiredEnvVars.filter((key) => !process.env[key]);
 
 if (missingVars.length > 0) {
-  logger.error('❌ Missing required environment variables:', { missing: missingVars });
+  logger.error('❌ Missing required environment variables:', {
+    missing: missingVars,
+  });
   process.exit(1);
 }
 
