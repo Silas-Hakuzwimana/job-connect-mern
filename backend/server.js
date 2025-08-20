@@ -31,6 +31,7 @@ const swaggerDocument = YAML.load('./docs/swagger.yaml');
 
 // Initialize app
 const app = express();
+const allowedOrigins = [process.env.FRONT_END_URL];
 
 // Connect to DB
 connectDB()
@@ -45,7 +46,15 @@ app.use(cookieParser());
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.FRONT_END_URL || 'https://job-connect-mern.vercel.app',
+    origin: function (origin, callback) {
+      // allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg = `CORS policy does not allow access from the specified origin: ${origin}`;
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
     credentials: true,
   }),
 );
