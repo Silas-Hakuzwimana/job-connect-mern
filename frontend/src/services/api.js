@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Create an axios instance with base URL and cookie support
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://job-connect-backend-n8c1.onrender.com/api',
   withCredentials: true, // send cookies with requests
 });
 
