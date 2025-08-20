@@ -64,6 +64,7 @@ app.use('/uploads', express.static('uploads'));
 // Request logger
 app.use(requestLogger);
 
+app.set('trust proxy', 1);
 // API Rate limiting
 app.use(
   rateLimit({
