@@ -101,8 +101,8 @@ exports.verifyOTP = async (req, res) => {
     res
       .cookie('token', token, {
         httpOnly: true,
-        secure: false, // force false for local dev (http)
-        sameSite: 'Lax', // 'Lax' allows sending cookies on top-level navigation
+        secure: process.env.NODE_ENV === 'production', // force false for local dev (http)
+        sameSite: 'None', // 'Lax' allows sending cookies on top-level navigation
         maxAge: 24 * 60 * 60 * 1000,
       })
       .status(200)
@@ -214,8 +214,8 @@ exports.resetPassword = async (req, res) => {
 exports.logout = (req, res) => {
   res.clearCookie('token', {
     httpOnly: true,
-    sameSite: 'Strict',
-    secure: process.env.NODE_ENV === 'development', // Optional: for production
+    sameSite: 'None',
+    secure: process.env.NODE_ENV === 'production', // Optional: for production
   });
   res.status(200).json({ message: 'Logged out successfully' });
 };
