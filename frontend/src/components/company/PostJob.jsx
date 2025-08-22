@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -20,6 +20,38 @@ const PostJob = () => {
     deadline: "",
   });
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+   const [companyProfile, setCompanyProfile] = useState(null);
+
+  // Check company approval status
+  useEffect(() => {
+    const checkApproval = async () => {
+      try {
+        if (user.role === "employer") {
+          const company = await fetchMyCompanyProfile();
+          if (!company?._id) {
+            toast.error("Company profile not found.");
+            navigate("/company/dashboard");
+            return;
+          }
+          if (company.status !== "approved") {
+            toast.error("Your company account is not approved yet. Cannot post jobs.");
+            navigate("/company/dashboard");
+            return;
+          }
+          setCompanyProfile(company);
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to verify company approval status.");
+        navigate("/company/dashboard");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkApproval();
+  }, [user, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -48,7 +80,6 @@ const PostJob = () => {
     setSaving(true);
 
     try {
-      const companyProfile = await fetchMyCompanyProfile();
       if (!companyProfile?._id) {
         toast.error("Company profile not found.");
         setSaving(false);
@@ -73,10 +104,10 @@ const PostJob = () => {
     }
   };
 
-  if (!user) {
+  if (!user || loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <p className="text-gray-500">You must be logged in to post a job.</p>
+        <p className="text-gray-500">{loading ? "Checking company approval..." : "You must be logged in to post a job."}</p>
       </div>
     );
   }
@@ -86,40 +117,15 @@ const PostJob = () => {
       <h2 className="text-2xl font-bold text-gray-800 mb-4">Post a New Job</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Job Title */}
-        <InputField
-          label="Job Title"
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
-          required
-        />
+        <InputField label="Job Title" name="title" value={formData.title} onChange={handleChange} required />
 
         {/* Description */}
-        <TextAreaField
-          label="Description"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          required
-        />
+        <TextAreaField label="Description" name="description" value={formData.description} onChange={handleChange} required />
 
         {/* Location & Salary */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <InputField
-            label="Location"
-            name="location"
-            value={formData.location}
-            onChange={handleChange}
-            required
-          />
-          <InputField
-            label="Salary"
-            name="salary"
-            value={formData.salary}
-            onChange={handleChange}
-            required
-            type="number"
-          />
+          <InputField label="Location" name="location" value={formData.location} onChange={handleChange} required />
+          <InputField label="Salary" name="salary" value={formData.salary} onChange={handleChange} required type="number" />
         </div>
 
         {/* Job Type */}

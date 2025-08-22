@@ -18,6 +18,14 @@ exports.createJob = async (req, res) => {
       return res.status(404).json({ error: 'Your company profile not found.' });
     }
 
+    // Ensure company is approved
+    if (company.status !== 'approved') {
+      return res.status(403).json({
+        error:
+          'Your company account is not approved. You cannot post jobs yet.',
+      });
+    }
+
     // Create job referencing company ObjectId
     const job = await Job.create({
       ...jobData,
@@ -28,7 +36,7 @@ exports.createJob = async (req, res) => {
 
     res.status(201).json(job);
   } catch (err) {
-    console.error(err);
+    console.error('Job creation error:', err);
     res
       .status(400)
       .json({ error: 'Job creation failed', details: err.message });
@@ -38,13 +46,15 @@ exports.createJob = async (req, res) => {
 exports.getAllJobs = async (req, res) => {
   try {
     // Fetch all approved active jobs and populate postedBy user
-    const jobs = await Job.find({ isActive: true, status: 'approved' })
-      .populate('postedBy', 'name email company'); // ensure postedBy.company exists if needed
+    const jobs = await Job.find({
+      isActive: true,
+      status: 'approved',
+    }).populate('postedBy', 'name email company'); // ensure postedBy.company exists if needed
 
     // Collect all company IDs from jobs
     const companyIds = jobs
-      .filter(job => job.company)
-      .map(job => job.company.toString());
+      .filter((job) => job.company)
+      .map((job) => job.company.toString());
 
     // Fetch companies once
     const companies = await Company.find({ _id: { $in: companyIds } });
@@ -54,7 +64,7 @@ exports.getAllJobs = async (req, res) => {
     }, {});
 
     // Add companyName field to each job
-    const jobsWithCompanyName = jobs.map(job => {
+    const jobsWithCompanyName = jobs.map((job) => {
       let companyName = 'Unknown Company';
 
       if (job.company && companyMap[job.company.toString()]) {
