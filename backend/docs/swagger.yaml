@@ -2,15 +2,24 @@ openapi: 3.0.0
 info:
   title: JobConnect API
   version: 1.0.0
-  description: API documentation for the JobConnect platform
+  description: Complete API documentation for the JobConnect platform
 
 servers:
-  - url: http://localhost:5000
+  - url: http://localhost:5000/api
+    description: Development server
+
+security:
+  - cookieAuth: []
 
 paths:
-  /api/auth/register:
+  # Authentication APIs
+  /auth/register:
     post:
+      tags:
+        - Authentication
       summary: Register a new user
+      description: Creates a new account. Returns user info (no password).
+      security: []
       requestBody:
         required: true
         content:
@@ -18,328 +27,58 @@ paths:
             schema:
               $ref: "#/components/schemas/UserInput"
       responses:
-        "201":
+        '201':
           description: User registered successfully
-        "400":
-          description: User already exists
-
-  /api/auth/login:
-    post:
-      summary: Login and receive OTP
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                password:
-                  type: string
-      responses:
-        "200":
-          description: OTP sent to email
-        "401":
-          description: Invalid credentials
-
-  /api/auth/verify-otp:
-    post:
-      summary: Verify OTP and get JWT token
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                otp:
-                  type: string
-      responses:
-        "200":
-          description: JWT token returned
-        "400":
-          description: Invalid or expired OTP
-
-  /api/auth/request-password-reset:
-    post:
-      summary: Request password reset link
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-      responses:
-        "200":
-          description: Password reset email sent
-
-  /api/auth/reset-password:
-    post:
-      summary: Reset password using token
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                token:
-                  type: string
-                newPassword:
-                  type: string
-      responses:
-        "200":
-          description: Password changed
-
-  /api/users:
-    get:
-      summary: Get all users (admin only)
-      security:
-        - bearerAuth: []
-      responses:
-        "200":
-          description: List of users
-
-  /api/users/{id}:
-    get:
-      summary: Get user by ID
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: User data
-    put:
-      summary: Update user by ID
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-      responses:
-        "200":
-          description: User updated
-    delete:
-      summary: Delete user (admin only)
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: User deleted
-
-  /api/users/{id}/role:
-    put:
-      summary: Update user role (admin only)
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                role:
-                  type: string
-                  enum: [jobseeker, employer, admin]
-      responses:
-        "200":
-          description: Role updated
-
-  /api/users/upload-profile-pic:
-    post:
-      summary: Upload profile picture to Cloudinary
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                profilePic:
-                  type: string
-                  format: binary
-      responses:
-        "200":
-          description: Profile picture uploaded
-
-  /api/jobs:
-    get:
-      summary: Get all active jobs
-      responses:
-        "200":
-          description: List of jobs
-    post:
-      summary: Create a new job post (Employer only)
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/JobInput"
-      responses:
-        "201":
-          description: Job created
-        "403":
-          description: Unauthorized
-
-  /api/jobs/{id}:
-    get:
-      summary: Get a single job by ID
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: Job found
-        "404":
-          description: Job not found
-    delete:
-      summary: Delete job (admin only)
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: Job deleted
-
-  /api/applications/apply/{jobId}:
-    post:
-      summary: Apply to a job with resume
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: jobId
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                qualifications:
-                  type: string
-                  description: JSON stringified array of qualifications
-                coverLetter:
-                  type: string
-                resume:
-                  type: string
-                  format: binary
-      responses:
-        "201":
-          description: Application submitted
-
-  /api/applications:
-    get:
-      summary: View your or managed applications
-      security:
-        - bearerAuth: []
-      responses:
-        "200":
-          description: List of applications
-
-  /api/admin/applications:
-    get:
-      summary: View all job applications (admin only)
-      security:
-        - bearerAuth: []
-      responses:
-        "200":
-          description: List of all job applications
-
-  /api/qualifications:
-    get:
-      summary: Get all qualifications
-      security:
-        - bearerAuth: []
-      responses:
-        "200":
-          description: List of qualifications
-    post:
-      summary: Create new qualification (Admin/Employer only)
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/QualificationInput"
-      responses:
-        "201":
-          description: Qualification created
-
-  /api/qualifications/{id}:
-    delete:
-      summary: Delete qualification (Admin only)
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: Qualification deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
 
 components:
   securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: token
+      description: Authentication cookie containing JWT token
 
   schemas:
+    # User schemas
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique user identifier
+        name:
+          type: string
+          description: User's full name
+        email:
+          type: string
+          format: email
+          description: User's email address
+        role:
+          type: string
+          enum: [jobseeker, employer, admin]
+          description: User's role in the system
+        profilePic:
+          type: string
+          description: URL to user's profile picture
+        phone:
+          type: string
+          description: User's phone number
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - email
+        - role
+
     UserInput:
       type: object
       required:
@@ -349,13 +88,97 @@ components:
       properties:
         name:
           type: string
+          minLength: 2
+          maxLength: 100
+          description: User's full name
         email:
           type: string
+          format: email
+          description: User's email address
         password:
           type: string
+          minLength: 6
+          description: User's password
         role:
           type: string
           enum: [jobseeker, employer, admin]
+          default: jobseeker
+          description: User's role in the system
+        phone:
+          type: string
+          description: User's phone number
+
+    UserUpdateInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        profilePic:
+          type: string
+          description: URL to profile picture
+
+    # Job schemas
+    Job:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique job identifier
+        title:
+          type: string
+          description: Job title
+        description:
+          type: string
+          description: Detailed job description
+        location:
+          type: string
+          description: Job location
+        company:
+          $ref: '#/components/schemas/Company'
+        qualifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/Qualification'
+          description: Required qualifications for the job
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+          description: Job approval status
+        salary:
+          type: object
+          properties:
+            min:
+              type: number
+            max:
+              type: number
+            currency:
+              type: string
+              default: USD
+        employmentType:
+          type: string
+          enum: [full-time, part-time, contract, internship]
+        postedBy:
+          type: string
+          description: ID of the user who posted the job
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - description
+        - location
+        - qualifications
 
     JobInput:
       type: object
@@ -367,14 +190,188 @@ components:
       properties:
         title:
           type: string
+          minLength: 5
+          maxLength: 200
+          description: Job title
         description:
           type: string
+          minLength: 50
+          description: Detailed job description
         location:
           type: string
+          minLength: 2
+          description: Job location
         qualifications:
           type: array
           items:
             type: string
+          minItems: 1
+          description: Array of qualification IDs required for the job
+        salary:
+          type: object
+          properties:
+            min:
+              type: number
+              minimum: 0
+            max:
+              type: number
+              minimum: 0
+            currency:
+              type: string
+              default: USD
+        employmentType:
+          type: string
+          enum: [full-time, part-time, contract, internship]
+          default: full-time
+
+    # Company schemas
+    Company:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique company identifier
+        name:
+          type: string
+          description: Company name
+        description:
+          type: string
+          description: Company description
+        address:
+          type: string
+          description: Company address
+        email:
+          type: string
+          format: email
+          description: Company contact email
+        phone:
+          type: string
+          description: Company phone number
+        website:
+          type: string
+          format: uri
+          description: Company website URL
+        logo:
+          type: string
+          description: URL to company logo
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+          description: Company verification status
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - address
+
+    CompanyInput:
+      type: object
+      required:
+        - name
+        - address
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 200
+          description: Company name
+        description:
+          type: string
+          maxLength: 2000
+          description: Company description
+        address:
+          type: string
+          minLength: 10
+          description: Company address
+        email:
+          type: string
+          format: email
+          description: Company contact email
+        phone:
+          type: string
+          description: Company phone number
+        website:
+          type: string
+          format: uri
+          description: Company website URL
+
+    # Application schemas
+    Application:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique application identifier
+        jobId:
+          type: string
+          description: ID of the job being applied for
+        job:
+          $ref: '#/components/schemas/Job'
+        applicantId:
+          type: string
+          description: ID of the user applying
+        applicant:
+          $ref: '#/components/schemas/User'
+        qualifications:
+          type: array
+          items:
+            type: string
+          description: Array of qualification IDs the applicant has
+        coverLetter:
+          type: string
+          description: Cover letter text
+        resumeUrl:
+          type: string
+          description: URL to the uploaded resume file
+        status:
+          type: string
+          enum: [pending, accepted, rejected]
+          default: pending
+          description: Application status
+        appliedAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - jobId
+        - applicantId
+        - qualifications
+        - resumeUrl
+        - status
+
+    # Qualification schemas
+    Qualification:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique qualification identifier
+        title:
+          type: string
+          description: Qualification title
+        description:
+          type: string
+          description: Detailed description of the qualification
+        category:
+          type: string
+          description: Qualification category
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
 
     QualificationInput:
       type: object
@@ -383,5 +380,1620 @@ components:
       properties:
         title:
           type: string
+          minLength: 2
+          maxLength: 200
+          description: Qualification title
         description:
           type: string
+          maxLength: 1000
+          description: Detailed description of the qualification
+        category:
+          type: string
+          maxLength: 100
+          description: Qualification category
+
+    # Bookmark schemas
+    Bookmark:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique bookmark identifier
+        userId:
+          type: string
+          description: ID of the user who bookmarked
+        jobId:
+          type: string
+          description: ID of the bookmarked job
+        job:
+          $ref: '#/components/schemas/Job'
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - userId
+        - jobId
+
+    # Notification schemas
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique notification identifier
+        userId:
+          type: string
+          description: ID of the user receiving the notification
+        title:
+          type: string
+          description: Notification title
+        message:
+          type: string
+          description: Notification message content
+        type:
+          type: string
+          enum: [info, success, warning, error]
+          default: info
+          description: Notification type
+        read:
+          type: boolean
+          default: false
+          description: Whether the notification has been read
+        hidden:
+          type: boolean
+          default: false
+          description: Whether the notification is hidden
+        createdAt:
+          type: string
+          format: date-time
+        readAt:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - id
+        - userId
+        - title
+        - message
+
+    NotificationInput:
+      type: object
+      required:
+        - userId
+        - title
+        - message
+      properties:
+        userId:
+          type: string
+          description: ID of the user to receive the notification
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Notification title
+        message:
+          type: string
+          minLength: 1
+          maxLength: 1000
+          description: Notification message content
+        type:
+          type: string
+          enum: [info, success, warning, error]
+          default: info
+          description: Notification type
+
+    # Error schemas
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message
+        code:
+          type: string
+          description: Error code
+        details:
+          type: object
+          description: Additional error details
+      required:
+        - message
+
+    Success:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Success message
+        data:
+          type: object
+          description: Response data
+      required:
+        - message
+
+  responses:
+    UnauthorizedError:
+      description: Authentication information is missing or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: "Unauthorized access"
+            code: "AUTH_ERROR"
+
+    ForbiddenError:
+      description: User doesn't have permission to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: "Forbidden: Insufficient permissions"
+            code: "PERMISSION_ERROR"
+
+    NotFoundError:
+      description: The requested resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: "Resource not found"
+            code: "NOT_FOUND"
+
+    ValidationError:
+      description: Input validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: "Validation failed"
+            code: "VALIDATION_ERROR"
+            details:
+              field: "email"
+              reason: "Invalid email format"
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: "Internal server error"
+            code: "INTERNAL_ERROR"
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization endpoints
+  - name: Users
+    description: User management operations
+  - name: Jobs
+    description: Job posting and management operations
+  - name: Companies
+    description: Company profile and management operations
+  - name: Applications
+    description: Job application operations
+  - name: Bookmarks
+    description: Job bookmarking operations
+  - name: Qualifications
+    description: Skills and qualification management
+  - name: Jobseekers
+    description: Jobseeker-specific operations
+  - name: Notifications
+    description: Notification system operations
+  - name: File Upload
+    description: File upload operations for images and documents
+  - name: Admin
+    description: Administrative operations (admin users only):
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        '400':
+          description: User already exists
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login a user
+      description: Logs in a user and sets authentication cookie.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 6
+      responses:
+        '200':
+          description: Logged in successfully, cookie set
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        '401':
+          description: Invalid credentials
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout a user
+      description: Clears the authentication cookie.
+      responses:
+        '200':
+          description: Logged out successfully
+
+  /auth/verify-otp:
+    post:
+      tags:
+        - Authentication
+      summary: Verify OTP
+      description: Verifies OTP sent via email and sets authentication cookie.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - otp
+              properties:
+                email:
+                  type: string
+                  format: email
+                otp:
+                  type: string
+                  minLength: 6
+                  maxLength: 6
+      responses:
+        '200':
+          description: OTP verified successfully, cookie set
+        '400':
+          description: Invalid or expired OTP
+
+  /auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Get current logged-in user
+      description: Returns info about the currently authenticated user.
+      responses:
+        '200':
+          description: User info returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        '401':
+          description: Unauthorized
+
+  /auth/forgot-password:
+    post:
+      tags:
+        - Authentication
+      summary: Request password reset
+      description: Sends a password reset link to user's email.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Password reset email sent
+
+  /auth/reset-password/{token}:
+    post:
+      tags:
+        - Authentication
+      summary: Reset password
+      description: Resets the password using the token sent via email.
+      security: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Password reset token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - newPassword
+              properties:
+                newPassword:
+                  type: string
+                  minLength: 6
+      responses:
+        '200':
+          description: Password reset successfully
+        '400':
+          description: Invalid or expired token
+
+  # User Management APIs
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Get all users (admin only)
+      responses:
+        '200':
+          description: List of all users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+  /users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Get user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        '404':
+          description: User not found
+
+    put:
+      tags:
+        - Users
+      summary: Update user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdateInput"
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+    delete:
+      tags:
+        - Users
+      summary: Delete user by ID (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User deleted
+
+  /users/{id}/role:
+    put:
+      tags:
+        - Users
+      summary: Update user role (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - role
+              properties:
+                role:
+                  type: string
+                  enum: [jobseeker, employer, admin]
+      responses:
+        '200':
+          description: Role updated
+
+  /users/upload-profile-pic:
+    post:
+      tags:
+        - Users
+      summary: Upload profile picture for logged-in user
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - profilePic
+              properties:
+                profilePic:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Profile picture uploaded
+
+  # Job Management APIs
+  /jobs:
+    get:
+      tags:
+        - Jobs
+      summary: Get all active jobs
+      security: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: location
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of jobs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jobs:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Job"
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  pages:
+                    type: integer
+
+    post:
+      tags:
+        - Jobs
+      summary: Create a new job post (Employer only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobInput"
+      responses:
+        '201':
+          description: Job created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        '403':
+          description: Unauthorized
+
+  /jobs/{id}:
+    get:
+      tags:
+        - Jobs
+      summary: Get a single job by ID
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        '404':
+          description: Job not found
+
+    delete:
+      tags:
+        - Jobs
+      summary: Delete job (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job deleted
+
+  # Company Management APIs
+  /company:
+    get:
+      tags:
+        - Companies
+      summary: Get all companies
+      responses:
+        '200':
+          description: List of companies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Company"
+
+    post:
+      tags:
+        - Companies
+      summary: Create a new company (Admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanyInput'
+      responses:
+        '201':
+          description: Company created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+        '403':
+          description: Unauthorized
+
+  /company/search:
+    get:
+      tags:
+        - Companies
+      summary: Search companies
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Search query
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Company'
+
+  /company/{id}:
+    get:
+      tags:
+        - Companies
+      summary: Get company by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Company data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+
+    put:
+      tags:
+        - Companies
+      summary: Update company by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanyInput'
+      responses:
+        '200':
+          description: Company updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+
+    delete:
+      tags:
+        - Companies
+      summary: Delete company by ID (Admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Company deleted
+
+  /company/profile/me:
+    get:
+      tags:
+        - Companies
+      summary: Get logged-in user's company profile
+      responses:
+        '200':
+          description: User's company profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+
+    put:
+      tags:
+        - Companies
+      summary: Update logged-in user's company profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanyInput'
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Company'
+
+  /company/company-id:
+    get:
+      tags:
+        - Companies
+      summary: Get logged-in user's company ID
+      responses:
+        '200':
+          description: Company ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  companyId:
+                    type: string
+
+  /company/dashboard/jobs:
+    get:
+      tags:
+        - Companies
+      summary: Get jobs and counts for dashboard
+      responses:
+        '200':
+          description: Jobs with counts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jobs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Job'
+                  totalJobs:
+                    type: integer
+                  activeJobs:
+                    type: integer
+
+  /company/{companyId}/jobs:
+    get:
+      tags:
+        - Companies
+      summary: Get jobs by company ID
+      parameters:
+        - name: companyId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Job'
+
+  /company/{companyId}/applications:
+    get:
+      tags:
+        - Companies
+      summary: Get applications for company's jobs
+      parameters:
+        - name: companyId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Applications for company's jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Application'
+
+  /company/dashboard/stats:
+    get:
+      tags:
+        - Companies
+      summary: Get company dashboard statistics
+      responses:
+        '200':
+          description: Dashboard statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalJobs:
+                    type: integer
+                  totalApplications:
+                    type: integer
+                  pendingApplications:
+                    type: integer
+
+  /company/notifications:
+    get:
+      tags:
+        - Companies
+      summary: Get company notifications
+      responses:
+        '200':
+          description: List of notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+
+  # Applications APIs
+  /applications/apply/{jobId}:
+    post:
+      tags:
+        - Applications
+      summary: Apply to a job with resume
+      description: Submit an application to a specific job. Requires authentication.
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the job to apply for
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - qualifications
+                - resume
+              properties:
+                qualifications:
+                  type: string
+                  description: JSON stringified array of applicant qualifications
+                coverLetter:
+                  type: string
+                  description: Cover letter text
+                resume:
+                  type: string
+                  format: binary
+                  description: PDF or DOCX resume file
+      responses:
+        '201':
+          description: Application submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '400':
+          description: Bad request or missing fields
+        '401':
+          description: Unauthorized
+
+  /applications:
+    get:
+      tags:
+        - Applications
+      summary: Get all applications (for admin or managed users)
+      responses:
+        '200':
+          description: List of applications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Application'
+
+  /applications/my:
+    get:
+      tags:
+        - Applications
+      summary: Get applications of the logged-in user
+      responses:
+        '200':
+          description: List of user's applications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Application'
+
+  /applications/flag-application:
+    post:
+      tags:
+        - Applications
+      summary: Check which jobs the user has already applied to
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jobIds
+              properties:
+                jobIds:
+                  type: array
+                  items:
+                    type: string
+                  description: List of job IDs to check applied status
+      responses:
+        '200':
+          description: Returns jobs with applied flag
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    jobId:
+                      type: string
+                    applied:
+                      type: boolean
+
+  # Bookmarks APIs
+  /bookmarks:
+    get:
+      tags:
+        - Bookmarks
+      summary: Get all bookmarks
+      description: Retrieves all bookmarks of the authenticated user.
+      responses:
+        '200':
+          description: List of bookmarks returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Bookmark'
+        '401':
+          description: Unauthorized
+
+    post:
+      tags:
+        - Bookmarks
+      summary: Add a bookmark
+      description: Adds a job or item to the authenticated user's bookmarks.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jobId
+              properties:
+                jobId:
+                  type: string
+                  description: ID of the job to bookmark
+      responses:
+        '201':
+          description: Bookmark added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bookmark'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+
+  /bookmarks/{id}:
+    delete:
+      tags:
+        - Bookmarks
+      summary: Remove a bookmark
+      description: Deletes a bookmark by ID for the authenticated user.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the bookmark to remove
+      responses:
+        '200':
+          description: Bookmark removed successfully
+        '401':
+          description: Unauthorized
+        '404':
+          description: Bookmark not found
+
+  # Qualifications APIs
+  /qualifications:
+    get:
+      tags:
+        - Qualifications
+      summary: Get all qualifications
+      responses:
+        '200':
+          description: List of qualifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Qualification"
+
+    post:
+      tags:
+        - Qualifications
+      summary: Create a new qualification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QualificationInput"
+      responses:
+        '201':
+          description: Qualification created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Qualification"
+
+  /qualifications/save:
+    post:
+      tags:
+        - Qualifications
+      summary: Save qualifications for the logged-in user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - qualificationIds
+              properties:
+                qualificationIds:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: User qualifications saved
+
+  /qualifications/me:
+    get:
+      tags:
+        - Qualifications
+      summary: Get logged-in user's qualifications
+      responses:
+        '200':
+          description: List of user's qualifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Qualification"
+
+  /qualifications/{id}:
+    get:
+      tags:
+        - Qualifications
+      summary: Get qualification by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Qualification found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Qualification"
+        '404':
+          description: Qualification not found
+
+    put:
+      tags:
+        - Qualifications
+      summary: Update qualification by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QualificationInput"
+      responses:
+        '200':
+          description: Qualification updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Qualification"
+
+    delete:
+      tags:
+        - Qualifications
+      summary: Delete qualification by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Qualification deleted
+
+  # Jobseeker APIs
+  /jobseeker/dashboard:
+    get:
+      tags:
+        - Jobseekers
+      summary: Get jobseeker dashboard data
+      responses:
+        '200':
+          description: Jobseeker dashboard data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalApplications:
+                    type: integer
+                  pendingApplications:
+                    type: integer
+                  acceptedApplications:
+                    type: integer
+                  rejectedApplications:
+                    type: integer
+
+  /jobseeker/profile:
+    get:
+      tags:
+        - Jobseekers
+      summary: Get logged-in jobseeker profile
+      responses:
+        '200':
+          description: Jobseeker profile data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+    put:
+      tags:
+        - Jobseekers
+      summary: Update jobseeker profile
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+                profilePic:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  # Notifications APIs
+  /notifications:
+    get:
+      tags:
+        - Notifications
+      summary: Get all notifications for the logged-in user
+      responses:
+        '200':
+          description: List of user notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+
+  /notifications/create:
+    post:
+      tags:
+        - Notifications
+      summary: Create a notification for a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationInput'
+      responses:
+        '201':
+          description: Notification created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+
+  /notifications/{notificationId}/read:
+    patch:
+      tags:
+        - Notifications
+      summary: Mark a notification as read
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notification marked as read
+
+  /notifications/unread-count:
+    get:
+      tags:
+        - Notifications
+      summary: Get count of unread notifications
+      responses:
+        '200':
+          description: Number of unread notifications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+
+  /notifications/{id}/hide:
+    post:
+      tags:
+        - Notifications
+      summary: Hide a notification
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notification hidden
+
+  /notifications/{id}/unhide:
+    post:
+      tags:
+        - Notifications
+      summary: Unhide a notification
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notification unhidden
+
+  /notifications/get-unhidden-notifications:
+    get:
+      tags:
+        - Notifications
+      summary: Fetch notifications that are not hidden
+      responses:
+        '200':
+          description: List of unhidden notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+
+  # File Upload APIs
+  /cloudinary/profile-image:
+    post:
+      tags:
+        - File Upload
+      summary: Upload profile image
+      description: Uploads a user's profile image to Cloudinary.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - image
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: The profile image file to upload
+      responses:
+        '200':
+          description: Profile image uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    description: URL of the uploaded image
+        '400':
+          description: Invalid file
+        '401':
+          description: Unauthorized
+
+  /cloudinary/application-files:
+    post:
+      tags:
+        - File Upload
+      summary: Upload application file
+      description: Upload a resume or cover letter file for a job application.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Resume or cover letter file to upload
+      responses:
+        '200':
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    description: URL of the uploaded file
+        '400':
+          description: Invalid file
+        '401':
+          description: Unauthorized
+
+  # Admin APIs
+  /admin/users:
+    get:
+      tags:
+        - Admin
+      summary: Get all users (Admin only)
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+  /admin/users/{id}:
+    delete:
+      tags:
+        - Admin
+      summary: Delete a user (Admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User deleted successfully
+
+  /admin/users/{id}/role:
+    put:
+      tags:
+        - Admin
+      summary: Update user role (Admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - role
+              properties:
+                role:
+                  type: string
+                  enum: [jobseeker, employer, admin]
+      responses:
+        '200':
+          description: User role updated successfully
+
+  /admin/jobs:
+    get:
+      tags:
+        - Admin
+      summary: Get all jobs (Admin only)
+      responses:
+        '200':
+          description: List of jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Job'
+
+  /admin/jobs/{id}:
+    delete:
+      tags:
+        - Admin
+      summary: Delete a job (Admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job deleted successfully
+
+  /admin/jobs/{jobId}/approve:
+    post:
+      tags:
+        - Admin
+      summary: Approve a job (Admin only)
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job approved
+
+  /admin/jobs/{jobId}/reject:
+    post:
+      tags:
+        - Admin
+      summary: Reject a job (Admin only)
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job rejected
+
+  /admin/applications:
+    get:
+      tags:
+        - Admin
+      summary: Get all job applications (Admin only)
+      responses:
+        '200':
+          description: List of applications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Application'
+
+  /admin/qualifications:
+    get:
+      tags:
+        - Admin
+      summary: Get all qualifications (Admin only)
+      responses:
+        '200':
+          description: List of qualifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Qualification'
+
+  /admin/qualifications/{id}:
+    delete:
+      tags:
+        - Admin
+      summary: Delete a qualification (Admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Qualification deleted successfully
+
+  /admin/dashboard-stats:
+    get:
+      tags:
+        - Admin
+      summary: Get admin dashboard statistics
+      responses:
+        '200':
+          description: Dashboard stats returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalUsers:
+                    type: integer
+                  totalJobs:
+                    type: integer
+                  totalApplications:
+                    type: integer
+                  totalCompanies:
+                    type: integer
+
+  /admin/companies:
+    get:
+      tags:
+        - Admin
+      summary: Get all companies (Admin only)
+      responses:
+        '200':
+          description: List of companies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Company'
+
+  /admin/companies/{id}:
+    get:
+      tags:
+        - Admin
+      summary: Get a single company by ID (Admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Company data returned
+          content

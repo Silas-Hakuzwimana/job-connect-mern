@@ -81,8 +81,8 @@ export default function Register() {
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          err.response?.data?.error ||
-          "Registration failed"
+        err.response?.data?.error ||
+        "Registration failed"
       );
     } finally {
       setLoading(false);
@@ -281,6 +281,27 @@ export default function Register() {
               {loading ? "Registering..." : "Register"}
             </button>
           </form>
+          <div className="mt-4 text-center space-y-1 text-sm text-gray-600">
+            <p>
+              Already have an account?{" "}
+              <button
+                type="button"
+                onClick={() => navigate("/login")}
+                className="text-blue-600 hover:underline"
+              >
+                Login here
+              </button>
+            </p>
+            <p>
+              <button
+                type="button"
+                onClick={() => navigate("/")}
+                className="text-blue-600 hover:underline"
+              >
+                Back home
+              </button>
+            </p>
+          </div>
         </div>
       </div>
     </div>
