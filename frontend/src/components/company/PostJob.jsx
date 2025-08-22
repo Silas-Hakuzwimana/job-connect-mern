@@ -21,26 +21,27 @@ const PostJob = () => {
   });
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
-   const [companyProfile, setCompanyProfile] = useState(null);
+  const [companyProfile, setCompanyProfile] = useState(null);
 
   // Check company approval status
   useEffect(() => {
     const checkApproval = async () => {
+      if (!user || user.role !== "employer") {
+        setLoading(false);
+        return;
+      }
       try {
-        if (user.role === "employer") {
-          const company = await fetchMyCompanyProfile();
-          if (!company?._id) {
-            toast.error("Company profile not found.");
-            navigate("/company/dashboard");
-            return;
-          }
-          if (company.status !== "approved") {
-            toast.error("Your company account is not approved yet. Cannot post jobs.");
-            navigate("/company/dashboard");
-            return;
-          }
-          setCompanyProfile(company);
+        const company = await fetchMyCompanyProfile();
+        if (!company?._id || company.status !== "approved") {
+          toast.error(
+            !company?._id
+              ? "Company profile not found."
+              : "Your company account is not approved yet. Cannot post jobs."
+          );
+          navigate("/company/dashboard");
+          return;
         }
+        setCompanyProfile(company); // only set if approved
       } catch (err) {
         console.error(err);
         toast.error("Failed to verify company approval status.");
@@ -77,15 +78,10 @@ const PostJob = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!companyProfile) return; // already handled by useEffect
     setSaving(true);
 
     try {
-      if (!companyProfile?._id) {
-        toast.error("Company profile not found.");
-        setSaving(false);
-        return;
-      }
-
       const payload = {
         ...formData,
         salary: Number(formData.salary),
@@ -111,6 +107,9 @@ const PostJob = () => {
       </div>
     );
   }
+
+  // Only render form if company is approved
+  if (!companyProfile) return null;
 
   return (
     <div className="max-w-3xl mx-auto bg-white shadow-md rounded-xl p-6 mt-6">
