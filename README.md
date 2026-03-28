@@ -1,4 +1,4 @@
-# JobConnect - MERN Stack Job Application Portal
+# JobConnect - MERN Stack Job Application Portal | Powered by iTechnology 
 
 ## Project Overview
 
